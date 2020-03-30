@@ -31,6 +31,10 @@ void Player::drawBuilding(Deck<Building*>* deck) {
     buildings->insert(deck->draw());
 }
 
+void Player::drawBuilding(BuildingPool* pool, int selection) {
+    pool->remove(selection);
+}
+
 void Player::drawHarvestTile(Deck<HarvestTile*>* deck, bool isShipment) {
     if (!deck) {
         throw std::invalid_argument("Cannot draw from the null deck.");
@@ -40,6 +44,10 @@ void Player::drawHarvestTile(Deck<HarvestTile*>* deck, bool isShipment) {
 
 void Player::buildVillage(int selection, pair<int, int> circle) {
     villageBoard->setCircle(buildings->select(selection), circle);
+}
+
+int Player::selectionType(int selection) const {
+    return buildings->typeOf(selection);
 }
 
 void Player::resourceTracker(GatherFacility* resources, int type, int cost) {
