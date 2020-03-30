@@ -114,7 +114,7 @@ void Game::displayBoard() const {
 	board->display();
 }
 
-void Game::displayCount() const {
+void Game::displayCount() const { // TODO rename this
 	resources->display();
 }
 
