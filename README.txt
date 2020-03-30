@@ -29,7 +29,7 @@ Similarily, on the Village Game Map (VGMap), a player can set their building til
 The GBMapLoader can read in the "gmap.txt" and will throw an exception for invalid maps such as "gmap_bad.txt".
 The VGMapLoader provides similar functionality for VGMap.s
 
-Serialized map files are found in the directory outerMain/res/. If you encounter an error when running due to this, thes directory should be moved to the folder containing your compiled binary.
+Serialized map files are found in the directory outerMain/res/. If you encounter an error when running due to this, this directory should be moved to the folder containing your compiled binary.
  
 Each player is an object, each player will have a harvest_hand, building_hand and their own village_board.
 
@@ -41,13 +41,10 @@ For programming assignment part 1, the harvest tiles are generated randomly and 
 
 
 The scoring_facilities class has a count, that fundamentally counts the number of same resources attached to it. 
-This is accomplished by a depth first search as well as applying a layer on top of the GBMap that color codes the nodes according to whether the node is to be searched (GRAY), 
-the node is in the process of getting searched (BLACK) or if the node is to not be searched (RED). If the node is to be labeled in the future to be searched, it is designated (WHITE).
-This approach was influenced by the way the garbage collector in JAVA works.
+This is accomplished by a breadth first search as well as applying a layer on top of the GBMap that color codes its nodes according to whether the node is to be searched (WHITE), the node is in the process of getting searched (GRAY), if the node is already searched (BLACK), or if the node is to not be searched (RED). This approach was influenced by the mark and sweep garbage collection algorithm.
 
 To build from Visual Studio:
 
 Unzip the contents of your download.
-Open Visual Studio, and from the 'File' menu, select open > folder.
-From the file browser popup, navigate to the directory into which you unzipped your download.
+Double click the file outerMain.sln in the project's root directory, or open it from Visual Studio.
 Press Ctrl+Shift+B to build the project.
