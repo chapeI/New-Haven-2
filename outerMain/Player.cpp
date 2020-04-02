@@ -43,10 +43,16 @@ void Player::drawHarvestTile(Deck<HarvestTile*>* deck, bool isShipment) {
 }
 
 void Player::buildVillage(int selection, pair<int, int> circle) {
+    Building* building = buildings->select(selection);
+    if (building->getValue() == VGMap::HEIGHT - circle.first) {
+        if (!building->isFaceUp()) {
+            building->flip();
+        }
+    }
     villageBoard->setCircle(buildings->select(selection), circle);
 }
 
-int Player::selectionType(int selection) const {
+int Player::buildingType(int selection) const {
     return buildings->typeOf(selection);
 }
 
@@ -68,6 +74,10 @@ void Player::adjustScore() {
     buildFacility->incrementBy(buildings->worth()); // TODO should only do this once
 }
 
+void Player::rotateTile(int selection) {
+    tiles->rotate(selection);
+}
+
 void Player::placeHarvestTile(int selection, GBMap* map, pair<int, int> square) {
     if (!map) {
         throw std::invalid_argument("Cannot place on the null map.");
@@ -75,18 +85,8 @@ void Player::placeHarvestTile(int selection, GBMap* map, pair<int, int> square) 
     map->setSquare(tiles->select(selection), square);
 }
 
-HarvestTile* Player::getShipmentTile() {
+HarvestTile* Player::receiveShipment() {
     return tiles->ship();
-}
-
-void Player::calculateResources(GBMap* map, pair<int, int> square, GatherFacility* resources) {
-    if (!map) {
-        throw std::invalid_argument("Cannot record resources on the null map.");
-    }
-    if (!resources) {
-        throw std::invalid_argument("Cannot record on null resources.");
-    }
-	map->calculateResources(square, resources);
 }
 
 void Player::display() const {
