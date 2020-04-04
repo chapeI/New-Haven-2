@@ -30,22 +30,19 @@ void Controller::inputIDs() {
 		while (true) {
 			std::cout << "Enter ID for player " << (i + 1) << ": ";
 			std::cin >> id;
-			while (id < 0 || std::cin.fail())
-			{
+			while (id < 0 || std::cin.fail()) {
 				std::cout << "Invalid ID. Try again.\n";
 				std::cin.clear();
 				std::cin.ignore(256, '\n');
 				std::cout << "Enter ID for player " << (i + 1) << ": ";
 				std::cin >> id;
 			}
-			try
-			{
+			try {
 				game->addPlayer(id);
 				std::cin.clear();
 				std::cin.ignore(256, '\n');
 				break;
-			}
-			catch (const std::invalid_argument & e) {
+			} catch (const std::invalid_argument & e) {
 				std::cerr << e.what() << " Try again.\n";
 			}
 		}
