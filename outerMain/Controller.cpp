@@ -25,16 +25,30 @@ void Controller::initGame() {
 }
 
 void Controller::inputIDs() {
+	long id;
 	for (int i = 0; i < game->numPlayers(); i++) {
-		do {
-			try {
-				game->addPlayer(in->get<long>("Enter ID for player "
-					+ std::to_string(i + 1), "Invalid ID."));
+		while (true) {
+			std::cout << "Enter ID for player " << (i + 1) << ": ";
+			std::cin >> id;
+			while (id < 0 || std::cin.fail())
+			{
+				std::cout << "Invalid ID. Try again.\n";
+				std::cin.clear();
+				std::cin.ignore(256, '\n');
+				std::cout << "Enter ID for player " << (i + 1) << ": ";
+				std::cin >> id;
+			}
+			try
+			{
+				game->addPlayer(id);
+				std::cin.clear();
+				std::cin.ignore(256, '\n');
 				break;
-			} catch (const std::invalid_argument& e) {
+			}
+			catch (const std::invalid_argument & e) {
 				std::cerr << e.what() << " Try again.\n";
 			}
-		} while (true);
+		}
 	}
 }
 
