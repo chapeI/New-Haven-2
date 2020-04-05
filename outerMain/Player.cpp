@@ -111,6 +111,10 @@ void Player::calculateScore() {
     village->calculateScore(score);
 }
 
+int Player::availableVillageSlots() {
+    return village->numberOfEmptySpaces();
+}
+
 void Player::rotateTile(int selection) {
     tiles->rotate(selection);
 }
@@ -142,6 +146,11 @@ void Player::displayTiles() const {
 
 void Player::displayBuildings() const {
     std::cout << *buildings;
+}
+
+int Player::buildingHandSize()
+{
+    return buildings->getSize();
 }
 
 void Player::displayVillage() const {

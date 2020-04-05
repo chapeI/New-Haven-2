@@ -38,6 +38,8 @@ public:
 	// Counts the villagers that have been attracted to this VGMap. Throws an exeption if the
 	// specified BuildFacility is null.
 	void calculateScore(BuildFacility*);
+	// Returns the number of empty spaces on this VGMap.
+	int numberOfEmptySpaces();
 	// Writes this VGMap to the standard output stream.
 	void display() const;
 

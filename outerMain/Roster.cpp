@@ -35,7 +35,79 @@ long Roster::nextID() const {
 }
 
 Player* Roster::winner() {
-	bool tied = false;
+	
+	std::map<long, Player*>::iterator it = players->begin();
+	std::map<long, Player*> sameScore;
+
+	sameScore.insert(std::pair<long, Player*>(it->first, it->second));
+	it++;
+	//check for same score
+	while (it != players->end())
+	{
+		if (it->second->getScore() > sameScore.begin()->second->getScore())
+		{
+			sameScore.erase(sameScore.begin());
+			sameScore.insert(std::pair<long, Player*>(it->first, it->second));
+		}
+		else if (it->second->getScore() == sameScore.begin()->second->getScore())
+		{
+			sameScore.insert(std::pair<long, Player*>(it->first, it->second));
+		}
+		it++;
+	}
+	
+	if (sameScore.size() > 1)
+	{
+		return sameScore.begin()->second;
+	}
+	else //check empty space tie
+	{
+		it = sameScore.begin();
+		std::map<long, Player*> winners;
+		winners.insert(std::pair<long, Player*>(it->first, it->second));
+		it++;
+		while (it != sameScore.end())
+		{
+			if (it->second->availableVillageSlots() < winners.begin()->second->availableVillageSlots())
+			{
+				winners.erase(winners.begin());
+				winners.insert(std::pair<long, Player*>(it->first, it->second));
+			}
+			else if (it->second->availableVillageSlots() == winners.begin()->second->availableVillageSlots())
+			{
+				winners.insert(std::pair<long, Player*>(it->first, it->second));
+			}
+			it++;
+		}
+
+		if (winners.size > 1)
+		{
+			return winners.begin()->second;
+		}
+		else //check remaining building in hand tie
+		{
+			it = winners.begin();
+			int leastBuildingsLeft = it->second->buildingHandSize();
+			it++;
+			int i = winners.size() -1;
+			for (int j = 0; j < i; j++)
+			{
+				if (it->second->buildingHandSize() < leastBuildingsLeft)
+				{
+					leastBuildingsLeft = it->second->buildingHandSize();
+					winners.erase(winners.begin());
+				}
+				else if (it->second->buildingHandSize() > leastBuildingsLeft)
+				{
+					winners.erase(it);
+				}
+				it++;
+			}
+			return winners.begin()->second;  //wrong, need to return the full list or how about just the IDs??
+		}
+	}
+	
+	/*bool tied = false;
 	Player* winner = nullptr;
 	for (auto& entry : *players) {
 		if (!winner || winner < entry.second) {
@@ -46,7 +118,7 @@ Player* Roster::winner() {
 			tied = true;
 		}
 	}
-	return tied ? nullptr : winner;
+	return tied ? nullptr : winner;*/
 }
 
 void Roster::add(long id, Player* player) {
