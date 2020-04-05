@@ -34,6 +34,16 @@ long Roster::nextID() const {
 	return ids->front();
 }
 
+void Roster::displayAllScores()
+{
+	std::map<long, Player*>::iterator it = players->begin();
+	std::cout << "The players' scores are...\n";
+	while (it != players->end()) {
+		std::cout << it->first << ": " << it->second->calculateScore << " colonists.\n";
+		it++;
+	}
+}
+
 std::vector<long> Roster::winner() {
 	
 	std::map<long, Player*>::iterator it = players->begin();
