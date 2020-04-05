@@ -80,7 +80,7 @@ Player* Roster::winner() {
 			it++;
 		}
 
-		if (winners.size > 1)
+		if (winners.size() > 1)
 		{
 			return winners.begin()->second;
 		}
@@ -106,19 +106,6 @@ Player* Roster::winner() {
 			return winners.begin()->second;  //wrong, need to return the full list or how about just the IDs??
 		}
 	}
-	
-	/*bool tied = false;
-	Player* winner = nullptr;
-	for (auto& entry : *players) {
-		if (!winner || winner < entry.second) {
-			winner = entry.second;
-			tied = false;
-		}
-		else if (winner == entry.second) {
-			tied = true;
-		}
-	}
-	return tied ? nullptr : winner;*/
 }
 
 void Roster::add(long id, Player* player) {
