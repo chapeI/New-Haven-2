@@ -25,7 +25,7 @@ public:
 	long nextID() const;
 	// Returns the Player in this Roster with the highest score, or null if there is a tie. Throws
 	// an exception if this Roster is empty.
-	Player* winner();
+	std::vector<long> winner();
 	// Adds the specified Player to this Roster with the specified id. Throws an exception if the
 	// specified id already belongs to another member of this Roster, or if the specified Player is
 	// null.

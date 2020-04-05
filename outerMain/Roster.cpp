@@ -34,76 +34,73 @@ long Roster::nextID() const {
 	return ids->front();
 }
 
-Player* Roster::winner() {
+std::vector<long> Roster::winner() {
 	
 	std::map<long, Player*>::iterator it = players->begin();
-	std::map<long, Player*> sameScore;
+	std::vector<long> winningIDs;
+	std::map<long, Player*> sameScore; //stores players with same score
 
 	sameScore.insert(std::pair<long, Player*>(it->first, it->second));
 	it++;
 	//check for same score
-	while (it != players->end())
-	{
-		if (it->second->getScore() > sameScore.begin()->second->getScore())
-		{
+	while (it != players->end()) {
+		if (it->second->getScore() > sameScore.begin()->second->getScore()) {
 			sameScore.erase(sameScore.begin());
 			sameScore.insert(std::pair<long, Player*>(it->first, it->second));
 		}
-		else if (it->second->getScore() == sameScore.begin()->second->getScore())
-		{
+		else if (it->second->getScore() == sameScore.begin()->second->getScore()) {
 			sameScore.insert(std::pair<long, Player*>(it->first, it->second));
 		}
 		it++;
 	}
 	
-	if (sameScore.size() > 1)
-	{
-		return sameScore.begin()->second;
+	if (sameScore.size() > 1) {
+		winningIDs.push_back(sameScore.begin()->first);
+		return winningIDs;
 	}
-	else //check empty space tie
-	{
+	else {   //check empty space tie
 		it = sameScore.begin();
-		std::map<long, Player*> winners;
+		std::map<long, Player*> winners; //initially stores players same number of free spaces in village
 		winners.insert(std::pair<long, Player*>(it->first, it->second));
 		it++;
-		while (it != sameScore.end())
-		{
-			if (it->second->availableVillageSlots() < winners.begin()->second->availableVillageSlots())
-			{
+		while (it != sameScore.end()) {
+			if (it->second->availableVillageSlots() < winners.begin()->second->availableVillageSlots()) {
 				winners.erase(winners.begin());
 				winners.insert(std::pair<long, Player*>(it->first, it->second));
 			}
-			else if (it->second->availableVillageSlots() == winners.begin()->second->availableVillageSlots())
-			{
+			else if (it->second->availableVillageSlots() == winners.begin()->second->availableVillageSlots()) {
 				winners.insert(std::pair<long, Player*>(it->first, it->second));
 			}
 			it++;
 		}
 
-		if (winners.size() > 1)
-		{
-			return winners.begin()->second;
+		if (winners.size() > 1) {
+			winningIDs.push_back(winners.begin()->first);
+			return winningIDs;
 		}
-		else //check remaining building in hand tie
-		{
+		else { //check remaining building in hand tie
 			it = winners.begin();
 			int leastBuildingsLeft = it->second->buildingHandSize();
 			it++;
 			int i = winners.size() -1;
-			for (int j = 0; j < i; j++)
-			{
-				if (it->second->buildingHandSize() < leastBuildingsLeft)
-				{
+			for (int j = 0; j < i; j++) {
+				if (it->second->buildingHandSize() < leastBuildingsLeft) {
 					leastBuildingsLeft = it->second->buildingHandSize();
 					winners.erase(winners.begin());
 				}
-				else if (it->second->buildingHandSize() > leastBuildingsLeft)
-				{
+				else if (it->second->buildingHandSize() > leastBuildingsLeft) {
 					winners.erase(it);
 				}
 				it++;
 			}
-			return winners.begin()->second;  //wrong, need to return the full list or how about just the IDs??
+	
+			it = winners.begin();
+			while (it != winners.end())
+			{
+				winningIDs.push_back(it->first);
+				it++;
+			}
+			return winningIDs;
 		}
 	}
 }
