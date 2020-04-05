@@ -90,9 +90,10 @@ void Controller::run() {
 		}
 		game->endTurn(shipment);
 	}
-	// Check for end game state
-	// Calculate scores
-	// If tie...
+	
+	std::cout << "\nGame finished!\n";
+	game->displayAllScores();
+	game->displayWinners();
 }
 
 bool Controller::rotateSelection() {

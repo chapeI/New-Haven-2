@@ -34,8 +34,7 @@ long Roster::nextID() const {
 	return ids->front();
 }
 
-void Roster::displayAllScores()
-{
+void Roster::displayAllScores() const{
 	std::map<long, Player*>::iterator it = players->begin();
 	std::cout << "The players' scores are...\n";
 	while (it != players->end()) {
