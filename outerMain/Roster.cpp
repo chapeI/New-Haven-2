@@ -38,7 +38,7 @@ void Roster::displayAllScores() const{
 	std::map<long, Player*>::iterator it = players->begin();
 	std::cout << "The players' scores are...\n";
 	while (it != players->end()) {
-		std::cout << it->first << ": " << it->second->calculateScore << " colonists.\n";
+		std::cout << it->first << ": " << it->second->getScore() << " colonists.\n";
 		it++;
 	}
 }
