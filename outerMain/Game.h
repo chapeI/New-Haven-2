@@ -20,11 +20,12 @@ public:
 	~Game();
 	// Returns the number of Players playing this Game.
 	int numPlayers() const;
-	// TODO
+	// Returns the ID of the current Player.
 	long nextID() const;
-	// TODO
+	// Returns true iff the current Player is able to build on their VGMap with the resources
+	// available.
 	bool canPlay() const;
-	// TODO
+	// Returns the number of ResourceTypes that were completely spent during a turn of this Game.
 	int exhausted() const;
 	// Returns true iff this Game's GBMap has only one unoccupied square.
 	int gameOver() const;
@@ -67,9 +68,8 @@ public:
 	// building.
 	void drawFromPool(int);
 	// Resets this Game's resource markers to zero, replenishes its BuildingPool, and induces the
-	// current Player to draw a new HarvestTile provided they did not just play their shipment tile.
-	// Throws an exception if the current Player did not just play their shipment tile despite
-	// being indicated otherwise, or if this Game has not been setup.
+	// current Player to draw a new HarvestTile if specified.Throws an exception if the current
+	// Player cannot hold another HarvestTile in their Hand.
 	void endTurn(bool);
 	// Writes this Game's GBMap to the standard output stream.
 	void displayBoard() const;
