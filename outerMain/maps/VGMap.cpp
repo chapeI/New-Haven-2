@@ -130,11 +130,6 @@ int VGMap::countCols() {
     return score;
 }
 
-int VGMap::numberOfEmptySpaces()
-{
-    return graph->emptyNodes();
-}
-
 void VGMap::display() const {
     std::cout << *this;
 }
