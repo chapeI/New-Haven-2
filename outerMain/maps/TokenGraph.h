@@ -11,8 +11,6 @@ class TokenGraph {
 
 public:
 
-	static constexpr int NUM_TYPES = 4;
-
 	// Static factory method: returns a TokenGraph configured as a grid of the specified height
 	// and width.
 	static TokenGraph* gridOf(int, int);
@@ -29,13 +27,18 @@ public:
 	// an exception if either of the specified coordinates does not reference a Node of this
 	// TokenGraph.
 	void addEdge(std::pair<int, int>, std::pair<int, int>);
+	// Returns true iff no Token occupies this TokenGraph at the specified coordinate. Throws an
+	// Exception if the specified coordinate does not reference a Node of this TokenGraph.
+	bool emptyAt(std::pair<int, int> coordinate);
+	// Returns the number of empty nodes on this TokenGraph.
+	int emptyNodes() const;
 	// Returns the Token occupying this TokenGraph at the specified coordinate, or null if the Node
 	// is empty. Throws an exceptionif the specified coordinate does not referecnce a Node of this
 	// TokenGraph.
 	AbstractToken* tokenAt(std::pair<int, int>) const;
 	// Returns true iff this TokenGraph contains a Token of the specified type.
 	bool hasType(int) const;
-	// Returns true iff any of the Nodes of this TokenGraoh that are adjacent to the one at the
+	// Returns true iff any of the Nodes of this TokenGraph that are adjacent to the one at the
 	// specified coordinate contain a Token of the specified type. Throws an exception if the
 	// specified coordinate does not reference a Node of this TokenGraph.
 	bool adjacentHolds(std::pair<int, int>, int) const;
@@ -87,8 +90,9 @@ private:
 
 	};
 
+	int* occupied;
 	std::map<std::pair<int, int>, Node*>* nodes;
-	std::bitset<NUM_TYPES>* types;
+	std::bitset<AbstractToken::NUM_TYPES>* types;
 
 	Node* nodeAt(std::pair<int, int>) const;
 	std::pair<int, int> validateCoordinate(std::pair<int, int>) const;

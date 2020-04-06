@@ -122,9 +122,9 @@ private:
 
 }; // Partial specialization to handle pointer types.
 
-// Returns a Deck of 60 HarvestTiles.
+// Returns a shuffled Deck of 60 HarvestTiles.
 Deck<HarvestTile*>* harvestTileDeck();
-// Returns a Deck of 144 Buildings.
+// Returns a shuffled Deck of 144 Buildings.
 Deck<Building*>* buildingDeck();
 
 // The collection of HarvestTiles owned by a Player.
@@ -134,19 +134,28 @@ public:
 
 	// Constructs a new HarvestTileHand object.
 	HarvestTileHand();
+	// Constructs a new HarvestTileHand object with the specified shipment tile.
+	HarvestTileHand(HarvestTile*);
 	// Constructs a new HarvestTileHand object with the same contents as the specified Hand.
 	HarvestTileHand(const HarvestTileHand&);
 	// Destroys this HarvestTileHand.
 	~HarvestTileHand();
 	// Adds the specified HarvestTile to this HarvestTileHand. Throws an exception if this
 	// HarvestTileHand is full.
-	void insert(HarvestTile*, bool);
+	void insert(HarvestTile*);
 	// Returns the HarvestTile selected by a Player. Throws an exception if the specified selection
-	// is not between one and two inclusive.
-	HarvestTile* exchange(int);
+	// is not between one and two inclusive, or the specified selection does not exit.
+	HarvestTile* select(int);
+	// Rotates the selected HarvestTile 90 degrees counterclockwise. Throws an exception if the
+	// specified slection is not betwewn one and two inclusive, or the specified seleciton does not
+	// exist.
+	void rotate(int);
 	// Returns this HarvestTileHand's shipment tile. Throws an exception if this Hand does not
 	// contain a shipment tile.
 	HarvestTile* ship();
+	// Adds the specified HarvestTile to this Hand as its shipment tile. Throws an exception if
+	// this Hand already has a shipment tile.
+	void receive(HarvestTile*);
 	// Writes this HarvestTileHand to the standard outoput stream.
 	void display() const;
 
@@ -160,6 +169,7 @@ private:
 
 	bool isEmpty() const;
 	bool isFull() const;
+	HarvestTile* validateSelection(int, bool);
 
 };
 
@@ -173,13 +183,16 @@ public:
 	BuildingHand(const BuildingHand&);
 	// Destroys this BuildingHand.
 	~BuildingHand();
+	// Returns the number of Buildings in this BuildingHand.
+	size_t getSize() const;
 	// Adds the specified Building to this BuildingHand.
 	void insert(Building*);
 	// Returns the Building selected by a Player. Throws an exception if the specified selection
 	// does not exist.
 	Building* select(int);
-	// Gives the aggregate value of all of the Buildings in this BuildingHand.
-	int worth();
+	// Returns the type of the selected Building. Throws an exception if the specified selection
+	// does not exist.
+	int typeOf(int) const;
 	// Writes this BuildingHand to the standard outoput stream.
 	void display() const;
 
@@ -188,6 +201,8 @@ public:
 private:
 	
 	std::vector<Building*>* owned;
+
+	int validateSelection(int selection) const;
 	
 };
 

@@ -8,22 +8,20 @@ static constexpr int SAMPLE_SIZE = 10;
 static Player* player;
 
 static void testDrawBuilding();
-static void testDrawHarvestTile();
+static void testDrawTile();
 static void testBuildVillage();
 static void testResourceTracker();
-static void testPlaceHarvestTile();
-static void testCalculateResources();
+static void testPlaceTile();
 static void setup();
 static void tearDown();
 
 void testPlayer() {
 	std::cout << "Running Player tests:" << std::endl;
 	testDrawBuilding();
-	testDrawHarvestTile();
+	testDrawTile();
 	testBuildVillage();
 	testResourceTracker();
-	testPlaceHarvestTile();
-	testCalculateResources();
+	testPlaceTile();
 	std::cout << std::endl;
 }
 
@@ -37,13 +35,13 @@ void testDrawBuilding() {
 	tearDown();
 }
 
-void testDrawHarvestTile() {
+void testDrawTile() {
 	Deck<HarvestTile*> deck;
 	setup();
-	ASSERT_THROWS(std::runtime_error, player->drawHarvestTile(&deck, false),
+	ASSERT_THROWS(std::runtime_error, player->drawTile(&deck),
 		"ERROR: drew from an empty deck.");
 	deck.add(new HarvestTile());
-	ASSERT_SUCCESS(player->drawHarvestTile(&deck, false), "Successfully drew from valid deck.");
+	ASSERT_SUCCESS(player->drawTile(&deck), "Successfully drew from valid deck.");
 	tearDown();
 }
 
@@ -58,7 +56,7 @@ void testResourceTracker() {
 	ASSERT_THROWS(std::invalid_argument, player->resourceTracker(nullptr, 0, 0),
 		"ERROR: recorded to the null GatherFacility.");
 	GatherFacility resources;
-	ASSERT_THROWS(std::runtime_error, player->resourceTracker(&resources, TokenGraph::NUM_TYPES, 1),
+	ASSERT_THROWS(std::runtime_error, player->resourceTracker(&resources, AbstractToken::NUM_TYPES, 1),
 		"ERROR: recorded to a non-existant resource.");
 	ASSERT_THROWS(std::runtime_error, player->resourceTracker(&resources, 0, 1),
 		"ERROR: made an invalid adjustment to resources.");
@@ -68,25 +66,14 @@ void testResourceTracker() {
 	tearDown();
 }
 
-void testPlaceHarvestTile() {
+void testPlaceTile() {
 	GBMap map;
 	setup();
-	ASSERT_THROWS(std::invalid_argument, player->placeHarvestTile(1, nullptr, { 0, 0 }),
+	ASSERT_THROWS(std::invalid_argument, player->placeTile(1, nullptr, { 0, 0 }),
 		"ERROR: placed tile onto the null GBMap.");
-	ASSERT_THROWS(std::invalid_argument, player->placeHarvestTile(3, &map, { 0, 0 }),
+	ASSERT_THROWS(std::invalid_argument, player->placeTile(3, &map, { 0, 0 }),
 		"ERROR: invalid tile selection allowed.");
-	ASSERT_SUCCESS(player->placeHarvestTile(1, &map, { 0, 0 }), "Successfully placed harvest tile.");
-	tearDown();
-}
-
-void testCalculateResources() {
-	setup();
-	ASSERT_THROWS(std::invalid_argument, player->calculateResources(nullptr, { 0, 0 },
-		&GatherFacility()), "ERROR: counted resources on the null map.");
-	ASSERT_THROWS(std::invalid_argument, player->calculateResources(&GBMap(), { 0, 0 }, nullptr),
-		"ERROR: recorded to the null gather facility.");
-	ASSERT_SUCCESS(player->calculateResources(&GBMap(), { 0, 0 }, &GatherFacility()),
-		"Successfully counted resource.");
+	ASSERT_SUCCESS(player->placeTile(1, &map, { 0, 0 }), "Successfully placed harvest tile.");
 	tearDown();
 }
 
@@ -96,7 +83,7 @@ void setup() {
 	Deck<HarvestTile*> tiles;
 	tiles.add(new HarvestTile());
 	player = new Player();
-	player->drawHarvestTile(&tiles, false);
+	player->drawTile(&tiles);
 	for (int i = 0; i < SAMPLE_SIZE; i++) {
 		buildings.add(new Building());
 		player->drawBuilding(&buildings);

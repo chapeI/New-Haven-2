@@ -15,7 +15,7 @@ GBMap::GBMap(int numPlayers) {
 }
 
 void GBMap::setNumPlayers(int numPlayers) {
-	if (!(numPlayers == 2 || numPlayers == 3 || numPlayers == 4)) {
+	if (numPlayers < PLAYERS_MIN || numPlayers > PLAYERS_MAX) {
 		throw std::invalid_argument("Number of players must be between 2 and 4.");
 	}
 	this->numPlayers = new int(numPlayers);
@@ -38,6 +38,24 @@ int GBMap::getNumPlayers() const {
 	return *numPlayers;
 }
 
+std::vector<std::pair<int, int>> GBMap::corners() const {
+	int lower = *numPlayers == PLAYERS_MAX ? 1 : 0;
+	int rows = (height() - 1) >> 1, cols = (width() - 1) >> 1;
+	vector <pair<int, int>> corners;
+	corners.push_back({ 0, lower });
+	corners.push_back({ 0, cols  - lower});
+	corners.push_back({ rows, lower});
+	corners.push_back({ rows, cols - lower});
+	return corners;
+}
+
+int GBMap::squaresLeft() const {
+	if (*numPlayers == PLAYERS_MAX) {
+		return (graph->emptyNodes() - (PLAYERS_MAX << PLAYERS_MIN)) >> PLAYERS_MIN;
+	}
+	return graph->emptyNodes() >> PLAYERS_MIN;
+}
+
 void GBMap::setSquare(HarvestTile* tile, pair<int, int> square) {
 	if (!tile) {
 		throw std::invalid_argument("Cannot place the null tile.");
@@ -46,18 +64,17 @@ void GBMap::setSquare(HarvestTile* tile, pair<int, int> square) {
 		graph->setTokenAt(tile->tokenize(), coordinate);
 	}
 	delete tile;
-	tile = nullptr;
 }
 
 void GBMap::calculateResources(pair<int, int> from, GatherFacility* resources,
 		ResourceToken* shipment) {
 	// Place shipment tile if it has been played.
 	if (shipment) {
-		for (auto& coordinate : coordinatesOf(from)) {
+		for (auto& coordinate : coordinatesOf(from, true)) {
 			graph->setTokenAt(new ResourceToken(*shipment), coordinate);
 		}
 	}
-	// Perform search for conntected resources starting from the four coordinates in from
+	// Perform search for conntected resources starting from the four coordinates in from.
 	for (auto& coordinate : coordinatesOf(from)) {
 		// Coordinate is occupied and has not been reached by a previous search.
 		if (graph->tokenAt(coordinate) && !graph->isSearched(coordinate)) {
@@ -79,6 +96,21 @@ void GBMap::calculateResources(pair<int, int> from, GatherFacility* resources,
 
 void GBMap::display() const {
 	std::cout << *this;
+}
+
+void GBMap::display(int type, pair<int, int> square) const {
+	int index = 0;
+	ResourceToken resource(static_cast<ResourceType>(AbstractToken::validateType(type)));
+	ResourceToken* temp[HarvestTile::NUM_RESOURCES] = {};
+	for (auto& coordinate : coordinatesOf(square)) {
+		temp[index++] = static_cast<ResourceToken*>(graph->tokenAt(coordinate));
+		graph->setTokenAt(&resource, coordinate);
+	}
+	index = 0;
+	std::cout << *this;
+	for (auto& coordinate : coordinatesOf(square)) {
+		graph->setTokenAt(temp[index++], coordinate);
+	}
 }
 
 int GBMap::height() const {
@@ -105,7 +137,7 @@ int GBMap::width() const {
 	}
 }
 
-vector<pair<int, int>> GBMap::coordinatesOf(pair<int, int> square, bool ensureEmpty) {
+vector<pair<int, int>> GBMap::coordinatesOf(pair<int, int> square, bool ensureEmpty) const {
 	validateSquare(square);
 	vector<pair<int, int>> coordinates = expand(square);
 	if (ensureEmpty) {
@@ -127,7 +159,7 @@ vector<pair<int, int>> GBMap::expand(pair<int, int> square) {
 	return coordinates;
 }
 
-void GBMap::validateSquare(pair<int, int> square) {
+void GBMap::validateSquare(pair<int, int> square) const {
 	int row = square.first, col = square.second;
 	switch (*numPlayers) {
 	case 4:
@@ -139,14 +171,17 @@ void GBMap::validateSquare(pair<int, int> square) {
 		if (row < 0 || row >= width() || col < 0 || col >= height()) {
 			throw std::invalid_argument("Square is not on board.");
 		}
+		break;
+	default:
+		throw std::logic_error("FATAL ERROR: numPlayers has unexpected value.");
 	}
 }
 
-bool GBMap::isOnCorner(int row, int col) {
+bool GBMap::isOnCorner(int row, int col) const {
 	return (row == 0 || row == height() - 1) && (col == 0 || col == width() - 1);
 }
 
-int numberOfNodes(GBMap& map) {
+int numberOfSpaces(GBMap& map) {
 	int nodes;
 	auto tokens = map.graph->tokens();
 	// Clear map so that all nodes will be counted.
@@ -158,11 +193,29 @@ int numberOfNodes(GBMap& map) {
 	for (auto& entry : tokens) {
 		map.graph->setTokenAt(entry.second, entry.first);
 	}
-	return nodes / 4;
+	return nodes >> 2;
 }
 
 std::ostream& operator<<(std::ostream& stream, const GBMap& map) {
+	int coordinate = 0;
+	stream << '\t';
+	for (int i = 0; i < map.width(); i++) {
+		if (i & 1) {
+			stream << '\t';
+		}
+		else {
+			stream << coordinate++ << '\t';
+		}
+	}
+	coordinate = 0;
+	stream << "\n\n\n";
 	for (int i = 0; i < map.height(); i++) {
+		if (i & 1) {
+			stream << '\t';
+		}
+		else {
+			stream << coordinate++ << '\t';
+		}
 		for (int j = 0; j < map.width(); j++) {
 			ResourceToken* resource = static_cast<ResourceToken*>(map.graph->tokenAt({ i, j }));
 			if (resource) {

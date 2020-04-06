@@ -2,29 +2,6 @@
 
 #include <map>
 
-// Records the number of colonists attracted to a Player's village.
-class BuildFacility {
-
-public:
-
-	// Constructs a new VillageBuildingScoringFacility object.
-	BuildFacility();
-	// Constructs a new VillageBuildingScoringFacility obeject with the same score as the specified
-	// VillageBuildingScoringFacility.
-	BuildFacility(const BuildFacility&);
-	// Destrorys this VillageBuildingScoringFacility
-	~BuildFacility();
-	// Returns the score recorded by this VillageBuildingScoreFacility.
-	int getScore() const;
-	// Increments the score recorded by this VillageBuildingScoreFacility by the specified amount.
-	void incrementBy(int);
-
-private:
-
-	int* score;
-
-};
-
 // Records the number of resources available to Players.
 class GatherFacility {
 
@@ -50,12 +27,12 @@ public:
 	// Writes this GatherFacility to the statndard output stream.
 	void display() const;
 
+	friend std::ostream& operator<<(std::ostream&, const GatherFacility&);
+
 private:
 
 	// key: ResourceType value: amount
 	std::map<int, int>* count;
-
-	int validateType(int) const;
 
 };
 

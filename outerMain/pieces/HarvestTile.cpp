@@ -23,7 +23,7 @@ HarvestTile::HarvestTile(ResourceToken* one, ResourceToken* two, ResourceToken* 
 	resources->push_back(four);
 }
 
-HarvestTile::HarvestTile(const HarvestTile& other) : AbstractPiece(other) {
+HarvestTile::HarvestTile(const HarvestTile& other) {
 	current = new int(*other.current);
 	resources = new vector<ResourceToken*>();
 	for (auto& resource : *other.resources) {
@@ -47,22 +47,15 @@ HarvestTile::~HarvestTile() {
 	delete resources;
 }
 
-void HarvestTile::rotate(int rotations) {
-	*current = (*current - validateRotation(rotations) + NUM_RESOURCES) % NUM_RESOURCES;
-}
-
-int HarvestTile::validateRotation(int rotations) {
-	// Avoid applying remainder operator to a negative number.
-	if (*current + NUM_RESOURCES < rotations) {
-		throw new std::invalid_argument("Cannot rotate " + std::to_string(rotations) + " times.");
-	}
-	return rotations;
+void HarvestTile::rotate() {
+	*current = ++(*current) & NUM_RESOURCES - 1;
 }
 
 ResourceToken* HarvestTile::tokenize() {
 	ResourceToken* returnToken = (*resources)[*current];
-	(*resources)[*current] = nullptr;
-	*current = ++(*current) % NUM_RESOURCES;
+	(*resources)[(*current)++] = nullptr;
+	// Avoid an expensive division op.
+	*current &= NUM_RESOURCES - 1;
 	return returnToken;
 }
 
@@ -70,16 +63,45 @@ void HarvestTile::display() const {
 	std::cout << *this;
 }
 
-std::ostream& operator<<(std::ostream& stream, const HarvestTile& tile) {
-	for (int i = 0; i < HarvestTile::NUM_RESOURCES; i++) {
-		stream << *(*tile.resources)[i];
-		// i is odd
+void HarvestTile::printHand(std::ostream& stream, const HarvestTile& one, const HarvestTile& two,
+		bool shipment) {
+	printHalf(stream, one, *one.current);
+	printHalf(stream, two, *two.current);
+	if (shipment) {
+		stream << "-- | --";
+	}
+	stream << '\n';
+	printHalf(stream, one, (*one.current + NUM_RESOURCES - 1) & NUM_RESOURCES - 1, true);
+	printHalf(stream, two, (*two.current + NUM_RESOURCES - 1) & NUM_RESOURCES - 1, true);
+	if (shipment) {
+		stream << "-- | --";
+	}
+	stream << '\n';
+}
+
+void HarvestTile::printHalf(std::ostream& stream, const HarvestTile& tile, int from,
+		bool countdown) {
+	for (int i = 0; i < NUM_RESOURCES >> 1; i++) {
+		stream << *(*tile.resources)[from];
+		if (countdown) {
+			from--;
+		}
+		else {
+			from++;
+		}
+		from &= NUM_RESOURCES - 1;
 		if (i & 1) {
-			stream << '\n';
+			stream << "\t\t";
 		}
 		else {
 			stream << " | ";
 		}
 	}
+}
+
+std::ostream& operator<<(std::ostream& stream, const HarvestTile& tile) {
+	HarvestTile::printHalf(stream, tile, *tile.current);
+	HarvestTile::printHalf(stream, tile, (*tile.current + HarvestTile::NUM_RESOURCES - 1)
+		& HarvestTile::NUM_RESOURCES - 1, true);
 	return std::cout << '\n';
 }

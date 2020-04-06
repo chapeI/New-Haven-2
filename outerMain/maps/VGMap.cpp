@@ -25,11 +25,26 @@ VGMap::~VGMap() {
 	delete graph;
 }
 
+bool VGMap::emptyAt(pair<int, int> circle) {
+    return graph->emptyAt(circle);
+}
+
+int VGMap::buildingCount() const {
+    return HEIGHT * WIDTH - graph->emptyNodes();
+}
+
+bool VGMap::hasType(int type) const {
+    return graph->hasType(type);
+}
+
+bool VGMap::adjacentHolds(pair<int, int> circle, int type) const {
+    return graph->adjacentHolds(circle, type);
+}
+
 void VGMap::setCircle(Building* building, pair<int, int> circle) {
     validatePlacement(building, circle);
     graph->setTokenAt(building->tokenize(), circle);
     delete building;
-    building = nullptr;
 }
 
 void VGMap::validatePlacement(const Building* building, pair<int, int> circle) {
@@ -61,11 +76,8 @@ bool VGMap::valuesMatch(const Building* building, int row) {
     return building->getValue() == HEIGHT - row;
 }
 
-void VGMap::calculateScore(BuildFacility* score) {
-    if (!score) {
-        throw std::invalid_argument("Cannot record score on the null build facility.");
-    }
-    score->incrementBy(countRows() + countCols());
+int VGMap::calculateScore() {
+    return countRows() + countCols();
 }
 
 int VGMap::countRows() {
@@ -123,7 +135,13 @@ void VGMap::display() const {
 }
 
 std::ostream& operator<<(std::ostream& stream, const VGMap& map) {
+    stream << '\t';
+    for (int i = 0; i < VGMap::WIDTH; i++) {
+        stream << i << '\t';
+    }
+    stream << "\n\n\n";
     for (int i = 0; i < VGMap::HEIGHT; i++) {
+        stream << i << '\t';
         for (int j = 0; j < VGMap::WIDTH; j++) {
             BuildingToken* building = static_cast<BuildingToken*>(map.graph->tokenAt({ i, j }));
             if (building) {
@@ -131,7 +149,7 @@ std::ostream& operator<<(std::ostream& stream, const VGMap& map) {
                 stream << '\t';
             }
             else {
-                stream << "-\t";
+                stream << VGMap::HEIGHT - i << "\t";
             }
         }
         stream << "\n\n\n";

@@ -115,10 +115,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="pieces\AbstractPiece.cpp" />
+    <ClCompile Include="util\Input.cpp" />
     <ClCompile Include="Roster.cpp" />
-    <ClCompile Include="test\GameStartDriver.cpp" />
     <ClCompile Include="test\ResourcesDriver.cpp" />
     <ClCompile Include="test\GBMapDriver.cpp" />
     <ClCompile Include="test\MapLoaderDriver.cpp" />
@@ -143,10 +143,11 @@
     <ClCompile Include="loaders\VGMapLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="util\Input.h" />
     <ClInclude Include="Roster.h" />
     <ClInclude Include="test\Drivers.h" />
-    <ClInclude Include="test\GameStartDriver.h" />
     <ClInclude Include="test\ResourcesDriver.h" />
     <ClInclude Include="test\GBMapDriver.h" />
     <ClInclude Include="test\MapLoaderDriver.h" />

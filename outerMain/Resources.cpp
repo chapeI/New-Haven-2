@@ -8,16 +8,18 @@
 using std::vector;
 using ResourceType = ResourceToken::ResourceType;
 
-HarvestTileHand::HarvestTileHand() {
+HarvestTileHand::HarvestTileHand() : HarvestTileHand(new HarvestTile()) {}
+
+HarvestTileHand::HarvestTileHand(HarvestTile* shipment) {
 	one = nullptr;
 	two = nullptr;
-	shipment = nullptr;
+	this->shipment = shipment;
 }
 
 HarvestTileHand::HarvestTileHand(const HarvestTileHand& other) {
 	one = other.one ? new HarvestTile(*other.one) : nullptr;
 	two = other.two ? new HarvestTile(*other.two) : nullptr;
-	shipment = new HarvestTile(*other.shipment);
+	shipment = other.shipment ? new HarvestTile(*other.shipment) : nullptr;
 }
 
 HarvestTileHand::~HarvestTileHand() {
@@ -26,23 +28,15 @@ HarvestTileHand::~HarvestTileHand() {
 	delete shipment;
 }
 
-void HarvestTileHand::insert(HarvestTile* tile, bool isShipment) {
-	if (isShipment) {
-		if (shipment) {
-			throw std::runtime_error("This hand already has a shipment tile");
-		}
-		shipment = tile;
+void HarvestTileHand::insert(HarvestTile* tile) {
+	if (isFull()) {
+		throw std::runtime_error("This hand is full.");
+	}
+	if (one) {
+		two = tile;
 	}
 	else {
-		if (isFull()) {
-			throw std::runtime_error("This hand is full.");
-		}
-		if (one) {
-			two = tile;
-		}
-		else {
-			one = tile;
-		}
+		one = tile;
 	}
 }
 
@@ -50,20 +44,39 @@ bool HarvestTileHand::isFull() const {
 	return one && two;
 }
 
-HarvestTile* HarvestTileHand::exchange(int selection) {
+HarvestTile* HarvestTileHand::select(int selection) {
+	return validateSelection(selection, true);
+}
+
+void HarvestTileHand::rotate(int selection) {
+	validateSelection(selection, false)->rotate();
+}
+
+HarvestTile* HarvestTileHand::validateSelection(int selection, bool remove) {
 	HarvestTile* tile;
-	if (isEmpty()) {
-		throw std::runtime_error("This hand is empty.");
-	}
 	switch (selection) {
 	case 1:
-		tile = one;
-		one = nullptr;
-		break;
+		if (one) {
+			tile = one;
+			if (remove) {
+				one = nullptr;
+			}
+			break;
+		}
+		else {
+			throw std::runtime_error("Tile unavailable.");
+		}
 	case 2:
-		tile = two;
-		two = nullptr;
-		break;
+		if (two) {
+			tile = two;
+			if (remove) {
+				two = nullptr;
+			}
+			break;
+		}
+		else {
+			throw std::runtime_error("Tile unavailable.");
+		}
 	default:
 		throw std::invalid_argument("Must select [1]st or [2]nd.");
 	}
@@ -78,7 +91,16 @@ HarvestTile* HarvestTileHand::ship() {
 	if (!shipment) {
 		throw std::runtime_error("Shipment tile already played.");
 	}
-	return shipment;
+	HarvestTile* tile = shipment;
+	shipment = nullptr;
+	return tile;
+}
+
+void HarvestTileHand::receive(HarvestTile* tile) {
+	if (shipment) {
+		throw std::runtime_error("Shipment already exists.");
+	}
+	shipment = tile;
 }
 
 void HarvestTileHand::display() const {
@@ -86,27 +108,12 @@ void HarvestTileHand::display() const {
 }
 
 std::ostream& operator<<(std::ostream& stream, const HarvestTileHand& hand) {
-	stream << "1\n";
-	if (hand.one) {
-		stream << *hand.one;
-	}
-	else {
-		stream << "None\n";
-	}
-	stream << "2\n";
-	if (hand.two) {
-		stream << *hand.two;
-	}
-	else {
-		stream << "None\n";
-	}
-	stream << "Shipment\n";
+	stream << "1\t\t2\t\t";
 	if (hand.shipment) {
-		stream << *hand.shipment;
+		stream << "3 - Shipment";
 	}
-	else {
-		stream << "None\n";
-	}	
+	stream << '\n';
+	HarvestTile::printHand(stream, *hand.one, *hand.two, hand.shipment);
 	return stream;
 }
 
@@ -127,32 +134,36 @@ BuildingHand::~BuildingHand() {
 	delete owned;
 }
 
+size_t BuildingHand::getSize() const {
+	return owned->size();
+}
+
 void BuildingHand::insert(Building* building) {
 	owned->push_back(building);
 }
 
 Building* BuildingHand::select(int selection) {
-	Building* building;
-	if (selection < 1 || selection > owned->size()) {
-		throw std::out_of_range("Selection not in range.");
-	}
-	building = (*owned)[--selection];
-	owned->erase(owned->begin() + selection);
+	int index = validateSelection(selection);
+	Building* building = (*owned)[index];
+	owned->erase(owned->begin() + index);
 	return building;
 }
 
-int BuildingHand::worth() {
-	int worth = 0;
-	for (auto& building : *owned) {
-		worth += building->getValue();
-	}
-	return worth;
+int BuildingHand::typeOf(int selection) const {
+	return (*owned)[validateSelection(selection)]->getType();
 }
 
+int BuildingHand::validateSelection(int selection) const {
+	if (selection < 1 || selection > owned->size()) {
+		throw std::out_of_range("Selection not in range.");
+	}
+	return --selection;
+}
 
 void BuildingHand::display() const {
 	std::cout << *this;
 }
+
 
 std::ostream& operator<<(std::ostream& stream, const BuildingHand& hand) {
 	for (int i = 0; i < hand.owned->size(); i++) {
@@ -239,7 +250,7 @@ std::ostream& operator<<(std::ostream& stream, const BuildingPool& buildings) {
 }
 
 Deck<HarvestTile*>* harvestTileDeck() {
-	int numTypes = TokenGraph::NUM_TYPES;
+	int numTypes = AbstractToken::NUM_TYPES;
 	Deck<HarvestTile*>* tiles = new Deck<HarvestTile*>();
 	for (int i = 0; i < numTypes; i++) {
 		for (int j = 0; j < numTypes; j++) {
@@ -248,15 +259,15 @@ Deck<HarvestTile*>* harvestTileDeck() {
 				tiles->add(new HarvestTile(
 					new ResourceToken(static_cast<ResourceType>(i)),
 					new ResourceToken(static_cast<ResourceType>(i)),
-					new ResourceToken(static_cast<ResourceType>(i)),
-					new ResourceToken(static_cast<ResourceType>(j))
+					new ResourceToken(static_cast<ResourceType>(j)),
+					new ResourceToken(static_cast<ResourceType>(i))
 				));
 				// For each resource type i and each type j, add a new tile with two i and two j.
 				tiles->add(new HarvestTile(
 					new ResourceToken(static_cast<ResourceType>(i)),
 					new ResourceToken(static_cast<ResourceType>(j)),
-					new ResourceToken(static_cast<ResourceType>(i)),
-					new ResourceToken(static_cast<ResourceType>(j))
+					new ResourceToken(static_cast<ResourceType>(j)),
+					new ResourceToken(static_cast<ResourceType>(i))
 				));
 			}
 		}
@@ -270,8 +281,8 @@ Deck<HarvestTile*>* harvestTileDeck() {
 					tiles->add(new HarvestTile(
 						new ResourceToken(static_cast<ResourceType>(i)),
 						new ResourceToken(static_cast<ResourceType>(j)),
-						new ResourceToken(static_cast<ResourceType>(i)),
-						new ResourceToken(static_cast<ResourceType>(k))
+						new ResourceToken(static_cast<ResourceType>(k)),
+						new ResourceToken(static_cast<ResourceType>(i))
 					));
 					if (j < k) {
 						// For each resource type i, each type j, and each type k, add a new tile
@@ -279,14 +290,15 @@ Deck<HarvestTile*>* harvestTileDeck() {
 						tiles->add(new HarvestTile(
 							new ResourceToken(static_cast<ResourceType>(i)),
 							new ResourceToken(static_cast<ResourceType>(j)),
-							new ResourceToken(static_cast<ResourceType>(k)),
-							new ResourceToken(static_cast<ResourceType>(i))
+							new ResourceToken(static_cast<ResourceType>(i)),
+							new ResourceToken(static_cast<ResourceType>(k))
 						));
 					}
 				}
 			}
 		}
 	}
+	tiles->shuffle();
 	return tiles;
 }
 
@@ -294,11 +306,12 @@ Deck<Building*>* buildingDeck() {
 	Deck<Building*>* buildings = new Deck<Building*>();
 	for (int i = 0; i < VGMap::HEIGHT; i++) {
 		for (int j = 0; j < VGMap::HEIGHT; j++) {
-			for (int k = 0; k < TokenGraph::NUM_TYPES; k++) {
+			for (int k = 0; k < AbstractToken::NUM_TYPES; k++) {
 				BuildingType type = static_cast<BuildingType>(k);
 				buildings->add(new Building(type, i + 1));
 			}
 		}
 	}
+	buildings->shuffle();
 	return buildings;
 }

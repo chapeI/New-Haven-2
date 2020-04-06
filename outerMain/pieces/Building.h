@@ -7,7 +7,7 @@
 
 using BuildingType = BuildingToken::BuildingType;
 
-// The Piece that belong to BuildingDecks and that occupy VGMaps.
+// The Piece that occupies BuildingDecks, BuildingHands, and BuildingPools.
 class Building : public AbstractPiece {
 
 	friend class VGMapLoader;
@@ -25,7 +25,7 @@ public:
 	~Building();
 	// Returns the type of this Building.
 	int getType() const;
-	// Returns true if Building is Face Up
+	// Returns true if this Building is Face Up
 	bool isFaceUp() const;
 	// Returns the value of this Building.
 	int getValue() const;

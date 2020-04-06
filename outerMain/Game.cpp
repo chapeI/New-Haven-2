@@ -1,9 +1,12 @@
+#include <string>
+
 #include "Game.h"
 #include "Resources.h"
 #include "util/Debug.h"
 
 using std::pair;
 using ResourceType = ResourceToken::ResourceType;
+
 
 Game::Game() : Game(DEFAULT_NUM_PLAYERS) {}
 
@@ -29,69 +32,148 @@ int Game::numPlayers() const {
 	return board->getNumPlayers();
 }
 
-size_t Game::tilesLeft() const {
-	return tiles->getSize();
+long Game::nextID() const {
+	return players->nextID();
 }
 
-size_t Game::buildingsLeft() const {
-	return buildings->getSize();
+bool Game::canPlay() const {
+	return players->peek()->canPlay(resources);
 }
 
-void Game::addPlayer(uint64_t id) {
+int Game::exhausted() const {
+	int exhausted = 0;
+	for (int i = 0; i < AbstractToken::NUM_TYPES; i++) {
+		if (!resources->countOf(i)) {
+			exhausted++;
+		}
+	}
+	return exhausted;
+}
+
+int Game::gameOver() const {
+	return board->squaresLeft() == 1;
+}
+
+std::list<long> Game::winners() const {
+	return players->winners();
+}
+
+int Game::highscore() const {
+	return players->max().getScore();
+}
+
+int Game::buidlingsLeft() const {
+	return players->max().unbuilt();
+}
+
+int Game::buildingsPlayed() const {
+	return players->max().built();
+}
+
+void Game::addPlayer(long id) {
 	if (atCapacity()) {
 		throw std::runtime_error("Too many players.");
 	}
-	Player* player = nullptr;
+	Player* player = new Player(tiles->draw());
 	try {
-		player = new Player();
 		players->add(id, player);
 	} catch (const std::invalid_argument& e) {
 		delete player;
 		throw e;
 	}
-}
-
-void Game::startGame() {
-	if (!atCapacity()) {
-		throw std::runtime_error("Too few players.");
+	if (atCapacity()) {
+		setup();
 	}
-	tiles->shuffle();
-	buildings->shuffle();
-	players->sort();
-	pool->replenish(buildings);
-	players->deal(tiles, buildings);
 }
 
 bool Game::atCapacity() const {
 	return players->getSize() == board->getNumPlayers();
 }
 
+void Game::setup() {
+	for (auto& square : board->corners()) {
+		board->setSquare(tiles->draw(), square);
+	}
+	pool->replenish(buildings);
+	players->sort();
+	players->deal(tiles, buildings);
+}
+
+void Game::rotateTile(int selection) {
+	players->peek()->rotateTile(selection);
+}
+
 void Game::playTile(int selection, pair<int, int> square) {
-	Player* current = players->next();
-	current->placeHarvestTile(selection, board, square);
-	current->calculateResources(board, square, resources);
+	players->peek()->placeTile(selection, board, square);
+	board->calculateResources(square, resources);
 }
 
 void Game::playShipment(pair<int, int> coordinate, int type) {
-	Player* current = players->next();
-	ResourceToken token(static_cast<ResourceType>(type));
-	HarvestTile* shipment = current->getShipmentTile();
-	board->calculateResources(coordinate, resources, &token);
-	board->setSquare(shipment, coordinate);
+	ResourceToken token(static_cast<ResourceType>(AbstractToken::validateType(type)));
+	HarvestTile* shipment = players->peek()->reap();
+	try {
+		board->calculateResources(coordinate, resources, &token);
+		board->setSquare(shipment, coordinate);
+	} catch (const std::exception& e) {
+		players->peek()->store(shipment);
+		throw e;
+	}
+}
+
+void Game::playBuilding(int selection, pair<int, int> coordinate) {
+	Player* current = players->peek();
+	current->resourceTracker(resources, current->buildingType(selection),
+		VGMap::HEIGHT - coordinate.first);
+	current->buildVillage(selection, coordinate);
+}
+
+void Game::yield() {
+	players->next();
+}
+
+void Game::drawFromDeck() {
+	players->peek()->drawBuilding(buildings);
+}
+
+void Game::drawFromPool(int selection) {
+	players->peek()->drawBuilding(pool, selection);
+}
+
+void Game::endTurn(bool shipped) {
+	resources->reset();
+	pool->replenish(buildings);
+	if (!shipped) {
+		players->next()->drawTile(tiles);
+	}
+	else {
+		players->next();
+	}
 }
 
 void Game::displayBoard() const {
 	board->display();
 }
 
-void Game::displayCount() const {
+void Game::displayBoard(int type, pair<int, int> square) const {
+	board->display(type, square);
+}
+
+void Game::displayTiles() const {
+	players->peek()->displayTiles();
+}
+
+void Game::displayVillage() const {
+	players->peek()->displayVillage();
+}
+
+void Game::displayResources() const {
 	resources->display();
+}
+
+void Game::displayBuildings() const {
+	players->peek()->displayBuildings();
 }
 
 void Game::displayPool() const {
 	pool->display();
-}
-
-void Game::displayerPlayers() const {
-	players->display();
 }
