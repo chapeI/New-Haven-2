@@ -15,7 +15,7 @@ GBMap::GBMap(int numPlayers) {
 }
 
 void GBMap::setNumPlayers(int numPlayers) {
-	if (!(numPlayers == 2 || numPlayers == 3 || numPlayers == 4)) {
+	if (numPlayers < PLAYERS_MIN || numPlayers > PLAYERS_MAX) {
 		throw std::invalid_argument("Number of players must be between 2 and 4.");
 	}
 	this->numPlayers = new int(numPlayers);
@@ -38,8 +38,22 @@ int GBMap::getNumPlayers() const {
 	return *numPlayers;
 }
 
+std::vector<std::pair<int, int>> GBMap::corners() const {
+	int lower = *numPlayers == PLAYERS_MAX ? 1 : 0;
+	int rows = (height() - 1) >> 1, cols = (width() - 1) >> 1;
+	vector <pair<int, int>> corners;
+	corners.push_back({ 0, lower });
+	corners.push_back({ 0, cols  - lower});
+	corners.push_back({ rows, lower});
+	corners.push_back({ rows, cols - lower});
+	return corners;
+}
+
 int GBMap::squaresLeft() const {
-	return graph->emptyNodes() >> 2;
+	if (*numPlayers == PLAYERS_MAX) {
+		return (graph->emptyNodes() - (PLAYERS_MAX << PLAYERS_MIN)) >> PLAYERS_MIN;
+	}
+	return graph->emptyNodes() >> PLAYERS_MIN;
 }
 
 void GBMap::setSquare(HarvestTile* tile, pair<int, int> square) {
@@ -84,6 +98,21 @@ void GBMap::display() const {
 	std::cout << *this;
 }
 
+void GBMap::display(int type, pair<int, int> square) const {
+	int index = 0;
+	ResourceToken resource(static_cast<ResourceType>(AbstractToken::validateType(type)));
+	ResourceToken* temp[HarvestTile::NUM_RESOURCES] = {};
+	for (auto& coordinate : coordinatesOf(square)) {
+		temp[index++] = static_cast<ResourceToken*>(graph->tokenAt(coordinate));
+		graph->setTokenAt(&resource, coordinate);
+	}
+	index = 0;
+	std::cout << *this;
+	for (auto& coordinate : coordinatesOf(square)) {
+		graph->setTokenAt(temp[index++], coordinate);
+	}
+}
+
 int GBMap::height() const {
 	switch (*numPlayers) {
 	case 2:
@@ -108,7 +137,7 @@ int GBMap::width() const {
 	}
 }
 
-vector<pair<int, int>> GBMap::coordinatesOf(pair<int, int> square, bool ensureEmpty) {
+vector<pair<int, int>> GBMap::coordinatesOf(pair<int, int> square, bool ensureEmpty) const {
 	validateSquare(square);
 	vector<pair<int, int>> coordinates = expand(square);
 	if (ensureEmpty) {
@@ -130,7 +159,7 @@ vector<pair<int, int>> GBMap::expand(pair<int, int> square) {
 	return coordinates;
 }
 
-void GBMap::validateSquare(pair<int, int> square) {
+void GBMap::validateSquare(pair<int, int> square) const {
 	int row = square.first, col = square.second;
 	switch (*numPlayers) {
 	case 4:
@@ -148,7 +177,7 @@ void GBMap::validateSquare(pair<int, int> square) {
 	}
 }
 
-bool GBMap::isOnCorner(int row, int col) {
+bool GBMap::isOnCorner(int row, int col) const {
 	return (row == 0 || row == height() - 1) && (col == 0 || col == width() - 1);
 }
 

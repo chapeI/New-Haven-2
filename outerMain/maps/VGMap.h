@@ -22,6 +22,8 @@ public:
 	// Returns true iff no Building occupies this VGMap at the specified circle. Throws an Exception
 	// if the specified circle does not reference a circle of this VGMap.
 	bool emptyAt(std::pair<int, int>);
+	// Returns the number of Buildings on this VGMap.
+	int buildingCount() const;
 	// Returns true iff this VGMap contains a Building of the specified type.
 	bool hasType(int) const;
 	// Returns true iff any of the circles of this VGMap that are adjacent to the one at the
@@ -35,11 +37,8 @@ public:
 	// (3) the specified Building is not being placed adjacent to another of the same type, or
 	// (4) the specified Building is being played face up on a circle that is not the correct value.
 	void setCircle(Building*, std::pair<int, int>);
-	// Counts the villagers that have been attracted to this VGMap. Throws an exeption if the
-	// specified BuildFacility is null.
-	void calculateScore(BuildFacility*);
-	// Returns the number of empty spaces on this VGMap.
-	int numberOfEmptySpaces();
+	// Counts the villagers that have been attracted to this VGMap.
+	int calculateScore();
 	// Writes this VGMap to the standard output stream.
 	void display() const;
 

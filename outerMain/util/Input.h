@@ -18,7 +18,7 @@ public:
     // Returns true iff the previously polled input was cancelled.
     bool cancelled() const;
     // Prompts the user for and collects their input to a yes or no question.
-    bool decide(const std::string&, bool = true);
+    bool decide(const std::string&);
     // Gets user input and interprets it as the specified type.
 	template <typename t>
 	t get(const std::string& prompt, const std::string& fail, bool canCancel = false) {
@@ -39,7 +39,7 @@ public:
                 }
             }
             if ((std::stringstream(input) >> result).fail()) {
-                std::cout << fail << " try again.\n";
+                std::cerr << fail << " try again.\n";
             }
             else {
                 break;

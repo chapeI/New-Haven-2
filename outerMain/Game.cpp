@@ -42,7 +42,7 @@ bool Game::canPlay() const {
 
 int Game::exhausted() const {
 	int exhausted = 0;
-	for (int i = 0; i < TokenGraph::NUM_TYPES; i++) {
+	for (int i = 0; i < AbstractToken::NUM_TYPES; i++) {
 		if (!resources->countOf(i)) {
 			exhausted++;
 		}
@@ -52,6 +52,22 @@ int Game::exhausted() const {
 
 int Game::gameOver() const {
 	return board->squaresLeft() == 1;
+}
+
+std::list<long> Game::winners() const {
+	return players->winners();
+}
+
+int Game::highscore() const {
+	return players->max().getScore();
+}
+
+int Game::buidlingsLeft() const {
+	return players->max().unbuilt();
+}
+
+int Game::buildingsPlayed() const {
+	return players->max().built();
 }
 
 void Game::addPlayer(long id) {
@@ -65,19 +81,22 @@ void Game::addPlayer(long id) {
 		delete player;
 		throw e;
 	}
-}
-
-void Game::setup() {
-	if (!atCapacity()) {
-		throw std::runtime_error("Too few players.");
+	if (atCapacity()) {
+		setup();
 	}
-	players->sort();
-	pool->replenish(buildings);
-	players->deal(tiles, buildings);
 }
 
 bool Game::atCapacity() const {
 	return players->getSize() == board->getNumPlayers();
+}
+
+void Game::setup() {
+	for (auto& square : board->corners()) {
+		board->setSquare(tiles->draw(), square);
+	}
+	pool->replenish(buildings);
+	players->sort();
+	players->deal(tiles, buildings);
 }
 
 void Game::rotateTile(int selection) {
@@ -90,11 +109,7 @@ void Game::playTile(int selection, pair<int, int> square) {
 }
 
 void Game::playShipment(pair<int, int> coordinate, int type) {
-	if (type < 0 || type > TokenGraph::NUM_TYPES - 1) { // TODO refactor this to somewhere else
-		throw std::runtime_error("Type must be between 0 and "
-			+ std::to_string(TokenGraph::NUM_TYPES - 1) + ".");
-	}
-	ResourceToken token(static_cast<ResourceType>(type));
+	ResourceToken token(static_cast<ResourceType>(AbstractToken::validateType(type)));
 	HarvestTile* shipment = players->peek()->reap();
 	try {
 		board->calculateResources(coordinate, resources, &token);
@@ -137,6 +152,10 @@ void Game::endTurn(bool shipped) {
 
 void Game::displayBoard() const {
 	board->display();
+}
+
+void Game::displayBoard(int type, pair<int, int> square) const {
+	board->display(type, square);
 }
 
 void Game::displayTiles() const {

@@ -29,6 +29,10 @@ bool VGMap::emptyAt(pair<int, int> circle) {
     return graph->emptyAt(circle);
 }
 
+int VGMap::buildingCount() const {
+    return HEIGHT * WIDTH - graph->emptyNodes();
+}
+
 bool VGMap::hasType(int type) const {
     return graph->hasType(type);
 }
@@ -72,12 +76,8 @@ bool VGMap::valuesMatch(const Building* building, int row) {
     return building->getValue() == HEIGHT - row;
 }
 
-void VGMap::calculateScore(BuildFacility* score) {
-    if (!score) {
-        throw std::invalid_argument("Cannot record score on the null build facility.");
-    }
-    score->reset();
-    score->incrementBy(countRows() + countCols());
+int VGMap::calculateScore() {
+    return countRows() + countCols();
 }
 
 int VGMap::countRows() {

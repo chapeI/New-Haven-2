@@ -10,6 +10,7 @@
 class GBMap {
 
 	static constexpr int DIM_MIN = 10, DIM_MAX = 14;
+	static constexpr int PLAYERS_MIN = 2, PLAYERS_MAX = 4;
 
 public:
 
@@ -24,6 +25,8 @@ public:
 	~GBMap();
 	// Returns the number of Playrs playing on this GBMap.
 	int getNumPlayers() const;
+	// Returns the coordinates of the corner squares on this GBMap.
+	std::vector<std::pair<int, int>> corners() const;
 	// Returns the number of unoccupied spaces on this GBMap.
 	int squaresLeft() const;
 	// Places the specified HarvestTile onto the specified square of this GBMap. The specified
@@ -38,6 +41,10 @@ public:
 	void calculateResources(std::pair<int, int>, GatherFacility*, ResourceToken* = nullptr);;
 	// Writes this GBMap to the standard output stream.
 	void display() const;
+	// Writes this GBMap to the standard output stream with four of the specified resource types
+	// occupying the specified square. Throws an exception if the specified type is invalid or if
+	// the specified square is not on this GBMap.
+	void display(int, std::pair<int, int>) const;
 
 	// Returns the number of connected nodes on the graph underlying the specified GBMap.
 	friend int numberOfSpaces(GBMap&);
@@ -53,8 +60,8 @@ private:
 	void setNumPlayers(int);
 	int height() const;
 	int width() const;
-	std::vector<std::pair<int, int>> coordinatesOf(std::pair<int, int>, bool = false);
-	void validateSquare(std::pair<int, int>);
-	bool isOnCorner(int, int);
+	std::vector<std::pair<int, int>> coordinatesOf(std::pair<int, int>, bool = false) const;
+	void validateSquare(std::pair<int, int>) const;
+	bool isOnCorner(int, int) const;
 
 };

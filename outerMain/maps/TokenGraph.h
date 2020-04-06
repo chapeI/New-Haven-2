@@ -11,8 +11,6 @@ class TokenGraph {
 
 public:
 
-	static constexpr int NUM_TYPES = 4;
-
 	// Static factory method: returns a TokenGraph configured as a grid of the specified height
 	// and width.
 	static TokenGraph* gridOf(int, int);
@@ -52,7 +50,7 @@ public:
 	// exception if the specifeid coordinate does not reference a Node of this TokenGraph.
 	void removeTokenAt(std::pair<int, int>);
 	// Initiates a breadth-first search of this TokenGraph from the Node at the specified coordinate.
-	// Returns the number of Nodes that are connected to the source Node, which contain the same type
+	// Returns the number of Nodes that are connected to the source Node and contain the same type
 	// of Token as the source. Throws an exception if the specified coordinate does not reference a
 	// Node of this TokenGraph.
 	int search(std::pair<int, int>);
@@ -94,7 +92,7 @@ private:
 
 	int* occupied;
 	std::map<std::pair<int, int>, Node*>* nodes;
-	std::bitset<NUM_TYPES>* types;
+	std::bitset<AbstractToken::NUM_TYPES>* types;
 
 	Node* nodeAt(std::pair<int, int>) const;
 	std::pair<int, int> validateCoordinate(std::pair<int, int>) const;

@@ -6,58 +6,60 @@ using std::pair;
 Player::Player() : Player(new HarvestTile()) {}
 
 Player::Player(HarvestTile* shipment) {
+    score = new int(0);
     tiles = new HarvestTileHand(shipment);
     buildings = new BuildingHand();
     village = new VGMap();
-    score = new BuildFacility();
 }
 
 Player::Player(const Player& other){
+    score = new int(*other.score);
     tiles = new HarvestTileHand(*other.tiles);
     buildings = new BuildingHand(*other.buildings);
     village = new VGMap(*other.village);
-    score = new BuildFacility(*other.score);
 }
 
 Player::~Player(){
+    delete score;
     delete tiles;
     delete buildings;
     delete village;
-    delete score;
 }
 
-bool Player::canPlay(GatherFacility* resources) {
+bool Player::canPlay(GatherFacility* resources) const {
+    int type;
     for (int i = 0; i < VGMap::HEIGHT; i++) {
         for (int j = 0; j < VGMap::WIDTH; j++) {
             if (village->emptyAt({ i, j })) {
                 for (int k = 0; k < buildings->getSize(); k++) {
-                    for (int l = 0; l < TokenGraph::NUM_TYPES; l++) {
-                        if (buildings->typeOf(k + 1) == l) {
-                            if (VGMap::HEIGHT - i == resources->countOf(l)) {
-                                if (village->hasType(l)) {
-                                    return village->adjacentHolds({ i, j }, l);
-                                }
-                                else {
-                                    return true;
-                                }
+                    type = buildings->typeOf(k + 1);
+                    if (VGMap::HEIGHT - i <= resources->countOf(type)) {
+                        if (village->hasType(type)) {
+                            if (village->adjacentHolds({ i, j }, type)) {
+                                return true;
                             }
                         }
                         else {
-                            continue;
+                            return true;
                         }
                     }
                 }
-            }
-            else {
-                continue;
             }
         }
     }
     return false;
 }
 
-int Player::getScore() {
-    return score->getScore();
+int Player::built() const {
+    return village->buildingCount();
+}
+
+int Player::unbuilt() const {
+    return buildings->getSize();
+}
+
+int Player::getScore() const {
+    return *score;
 }
 
 void Player::drawBuilding(Deck<Building*>* deck) {
@@ -108,7 +110,7 @@ void Player::resourceTracker(GatherFacility* resources, int type, int cost) {
 }
 
 void Player::calculateScore() {
-    village->calculateScore(score);
+    *score = village->calculateScore();
 }
 
 int Player::availableVillageSlots() {
@@ -157,10 +159,17 @@ void Player::displayVillage() const {
     std::cout << *village;
 }
 
-bool operator<(const Player& one, const Player& two) {
-    return one.score->getScore() < two.score->getScore();
+bool Player::operator<(const Player& other) const {
+    if (*score != *other.score) {
+        return *score < *other.score;
+    }
+    if (built() != other.built()) {
+        return built() < other.built();
+    }
+    return other.unbuilt() < unbuilt();
 }
 
-bool operator==(const Player& one, const Player& two) {
-    return one.score->getScore() == two.score->getScore();
+bool Player::operator==(const Player& other) const {
+    return *score == *other.score && built() == other.built()
+        && unbuilt() == other.unbuilt();
 }

@@ -22,9 +22,13 @@ public:
     ~Player();
     // Returns true iff the this Player is able to build on their VGMap with the resources
     // available in the specified GatherFacility.
-    bool canPlay(GatherFacility*);
+    bool canPlay(GatherFacility*) const;
+    // Returns the number of Buildings this Player has built.
+    int built() const;
+    // Returns the number of Buildings remaining in this Player's Hand.
+    int unbuilt() const;
     // Returns this Player's score.
-    int getScore();
+    int getScore() const;
     // Induces this Player to draw a Building from the specified Deck. Throws an exception if the
     // specified Deck is null or empty.
     void drawBuilding(Deck<Building*>*);
@@ -48,7 +52,7 @@ public:
     // specified cost. Throws an exception if the specified type is out of the specified
     // GatherFacility's bounds, if the specified GatherFacility is null, or if the resources
     // available to this Player are insufficiet to cover the specified cost.
-    void resourceTracker(GatherFacility*, int, int); // TODO this belongs in GatherFacility
+    void resourceTracker(GatherFacility*, int, int);
     // Counts the villagers attracted to this Player's village.
     void calculateScore();
     // Returns the number of empty spaces on this player's VGMap.
@@ -76,15 +80,15 @@ public:
     // Writes this Player's VGMap to the standard output stream.
     void displayVillage() const;
 
-    friend bool operator<(const Player&, const Player&);
-    friend bool operator==(const Player&, const Player&);
+    bool operator<(const Player&) const;
+    bool operator==(const Player&) const;
 
 private:
     
+    int* score;
     HarvestTileHand* tiles;
     BuildingHand* buildings;
     VGMap* village;
-    BuildFacility* score;
 
 
 };

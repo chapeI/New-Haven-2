@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <list>
 #include <map>
 
 #include "Player.h"
@@ -23,10 +24,10 @@ public:
 	size_t getSize() const;
 	// Returns the ID of the Player at the front of this Roster.
 	long nextID() const;
-	// Prints the scores of all players in this Roster.
-	void displayAllScores() const;
-	// Prints the IDs of the winning players.
-	std::vector<long> winner();
+	// Returns a list of the winning Player(s) IDs.
+	// Returns the Player in this Roster with the highest score.
+	Player max() const;
+	std::list<long> winners() const;
 	// Adds the specified Player to this Roster with the specified id. Throws an exception if the
 	// specified id already belongs to another member of this Roster, or if the specified Player is
 	// null.

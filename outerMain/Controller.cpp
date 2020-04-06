@@ -25,37 +25,26 @@ void Controller::initGame() {
 }
 
 void Controller::inputIDs() {
-	long id;
 	for (int i = 0; i < game->numPlayers(); i++) {
-		while (true) {
-			std::cout << "Enter ID for player " << (i + 1) << ": ";
-			std::cin >> id;
-			while (id < 0 || std::cin.fail()) {
-				std::cout << "Invalid ID. Try again.\n";
-				std::cin.clear();
-				std::cin.ignore(256, '\n');
-				std::cout << "Enter ID for player " << (i + 1) << ": ";
-				std::cin >> id;
-			}
+		do {
 			try {
-				game->addPlayer(id);
-				std::cin.clear();
-				std::cin.ignore(256, '\n');
+				game->addPlayer(in->get<long>("Enter ID for player "
+					+ std::to_string(i + 1), "Invalid ID."));
 				break;
-			} catch (const std::invalid_argument & e) {
+			} catch (const std::invalid_argument& e) {
 				std::cerr << e.what() << " Try again.\n";
 			}
-		}
+		} while (true);
 	}
 }
 
 void Controller::run() {
 	int exhausted;
 	bool shipment;
-	game->setup();
 	while (!game->gameOver()) {
 		game->displayBoard();
 		game->displayTiles();
+		game->displayVillage();
 		while (in->decide("Player " + std::to_string(game->nextID())
 			+ ", do you want to rotate any of your tiles?")) {
 			if (!rotateSelection()) {
@@ -65,7 +54,11 @@ void Controller::run() {
 		shipment = placeSelection();
 		for (int i = 0; i < game->numPlayers(); i++) {
 			while (in->decide("Player " + std::to_string(game->nextID())
-				+ ", do you want to play a building?", game->canPlay())) {
+				+ ", do you want to play a building?")) {
+				if (!game->canPlay()) {
+					std::cout << "You have no more valid moves.\n";
+					break;
+				}
 				if (!buildSelection()) {
 					break;
 				}
@@ -90,10 +83,12 @@ void Controller::run() {
 		}
 		game->endTurn(shipment);
 	}
-	
-	std::cout << "\nGame finished!\n";
-	game->displayAllScores();
-	game->displayWinners();
+	std::cout << "And our winner(s) is:\n";
+	for (auto& id : game->winners()) {
+		std::cout << "Player " << id << std::endl;
+	}
+	std::cout << "with " << game->highscore() << " villagers, " << game->buildingsPlayed()
+		<< " buildings erected, and " << game->buidlingsLeft() << " buildings left.";
 }
 
 bool Controller::rotateSelection() {
@@ -128,7 +123,7 @@ bool Controller::placeSelection() {
 			}
 			try {
 				game->playShipment({ row, col }, type);
-				// TODO display fake board
+				game->displayBoard(type, { row, col });
 				shipment = true;
 				break;
 			} catch (const std::exception& e) {

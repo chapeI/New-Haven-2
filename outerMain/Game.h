@@ -1,5 +1,7 @@
 #pragma once
 
+#include <list>
+
 #include "maps/GBMap.h"
 #include "Player.h"
 #include "Roster.h"
@@ -29,12 +31,17 @@ public:
 	int exhausted() const;
 	// Returns true iff this Game's GBMap has only one unoccupied square.
 	int gameOver() const;
+	// Returns a list of the winning Player(s) IDs.
+	std::list<long> winners() const;
+	// Returns the score of the winner of this Game.
+	int highscore() const;
+	// Returns the number of Buildings that the winner of this Game failed to play.
+	int buidlingsLeft() const;
+	// Returns the number of Buildings the the winner of this Game played.
+	int buildingsPlayed() const;
 	// Adds a new Player with the specified id to this Game's Roster. Throws an exception if this
 	// Game's Roster is already full.
 	void addPlayer(long);
-	// Deals HarvestTiles and Buildings to each Player in this Game's Roster, and intitializes this
-	// Game's BuildingPool.
-	void setup();
 	// Rotates the selected HarvestTile in the current Player's HarvestTileHand 90 degrees
 	// counterclockwise. Throws an exception if the specified selection is not consistent with the
 	// current Player's hand, or if this Game has not been setup.
@@ -73,6 +80,10 @@ public:
 	void endTurn(bool);
 	// Writes this Game's GBMap to the standard output stream.
 	void displayBoard() const;
+	// Writes this Game's GBMap to the standard output stream with four of the specified resource
+	// types occupying the specified square. Throws an exception if the specified type is invalid
+	// or if the specified square is not on this Games's GBMap.
+	void displayBoard(int, std::pair<int, int>) const;
 	// Writes the current Player's HarvestTileHand to the standard output stream.
 	void displayTiles() const;
 	// Writes the current Player's VGMap to the standard output stream.
@@ -98,6 +109,7 @@ private:
 	Roster* players;
 
 	bool atCapacity() const;
+	void setup();
 
 };
 
