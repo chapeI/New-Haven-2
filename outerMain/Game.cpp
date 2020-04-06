@@ -177,22 +177,3 @@ void Game::displayBuildings() const {
 void Game::displayPool() const {
 	pool->display();
 }
-
-void Game::displayAllScores() const {
-	players->displayAllScores();
-}
-
-void Game::displayWinners(){
-	std::vector<long> winners = players->winner();
-	std::vector<long>::iterator it = winners.begin();
-	int count = 0;
-	while (it != winners.end()) {
-		if (count > 0) {
-			std::cout << ", ";
-		}
-		std::cout << *it;
-		count++;
-		it++;
-	}
-	std::cout << " wins!\n";
-}
