@@ -94,10 +94,6 @@ public:
 	void displayBuildings() const;
 	// Writes this Game's BuildingPool to the standard output stream.
 	void displayPool() const;
-	// Writes this Game's Roster scores to the standard output stream.
-	void displayAllScores() const;
-	// Writes this Game's Roster's winners to the standard output stream.
-	void displayWinners();
 
 private:
 

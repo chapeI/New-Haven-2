@@ -55,8 +55,6 @@ public:
     void resourceTracker(GatherFacility*, int, int);
     // Counts the villagers attracted to this Player's village.
     void calculateScore();
-    // Returns the number of empty spaces on this player's VGMap.
-    int availableVillageSlots();
     // Rotates the selected HarvestTile 90 degrees counterclockwise. Throws an exception if the
     // specified slection is not consistent with this Player's hand.
     void rotateTile(int);
@@ -75,8 +73,6 @@ public:
     void displayTiles() const;
     // Writes this Player's BuildingHand to the standard output stream.
     void displayBuildings() const;
-    // Returns the number of buildings in this player's BuildingHand.
-    int buildingHandSize();
     // Writes this Player's VGMap to the standard output stream.
     void displayVillage() const;
 
