@@ -1,12 +1,11 @@
 #include <iostream>
 
-#include "maps/TokenGraph.h"
-#include "maps/VGMap.h"
+#include "../maps/TokenGraph.h"
+#include "../maps/VGMap.h"
+#include "../util/Debug.h"
 #include "Resources.h"
-#include "util/Debug.h"
 
 using std::vector;
-using ResourceType = ResourceToken::ResourceType;
 
 HarvestTileHand::HarvestTileHand() : HarvestTileHand(new HarvestTile()) {}
 

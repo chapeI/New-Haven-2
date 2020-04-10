@@ -1,13 +1,14 @@
 #pragma once
 
-#include <array>
+#include <ostream>
 
+#include "../components/ScoringFacilities.h"
+#include "../observer/Observable.h"
 #include "../pieces/Building.h"
-#include "../ScoringFacilities.h"
 #include "TokenGraph.h"
 
 // The Board on which Players build their village.
-class VGMap {
+class VGMap : public Observable {
 
 public:
 
@@ -46,7 +47,7 @@ public:
 
 private:
 
-    TokenGraph* graph;
+	TokenGraph* graph;
 
 	static bool valuesMatch(const Building*, int);
 

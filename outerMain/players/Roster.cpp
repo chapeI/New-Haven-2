@@ -1,5 +1,5 @@
 #include "Roster.h"
-#include "util/Debug.h"
+#include "../util/Debug.h"
 
 using std::deque;
 using std::list;
