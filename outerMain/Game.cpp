@@ -1,11 +1,10 @@
 #include <string>
 
+#include "components/Resources.h"
 #include "Game.h"
-#include "Resources.h"
 #include "util/Debug.h"
 
 using std::pair;
-using ResourceType = ResourceToken::ResourceType;
 
 
 Game::Game() : Game(DEFAULT_NUM_PLAYERS) {}
@@ -121,10 +120,16 @@ void Game::playShipment(pair<int, int> coordinate, int type) {
 }
 
 void Game::playBuilding(int selection, pair<int, int> coordinate) {
+	int type, cost = VGMap::HEIGHT - coordinate.first;
 	Player* current = players->peek();
-	current->resourceTracker(resources, current->buildingType(selection),
-		VGMap::HEIGHT - coordinate.first);
-	current->buildVillage(selection, coordinate);
+	type = current->buildingType(selection);
+	current->resourceTracker(resources, type, cost);
+	try {
+		current->buildVillage(selection, coordinate);
+	} catch (const std::exception& e) {
+		resources->incrementBy(type, cost);
+		throw e;
+	}
 }
 
 void Game::yield() {

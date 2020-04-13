@@ -42,25 +42,31 @@ void Controller::run() {
 	int exhausted;
 	bool shipment;
 	while (!game->gameOver()) {
-		game->displayBoard();
-		game->displayTiles();
-		game->displayVillage();
+		displayPossessions();
+		// Prompt player to rotate tiles.
 		while (in->decide("Player " + std::to_string(game->nextID())
 			+ ", do you want to rotate any of your tiles?")) {
 			if (!rotateSelection()) {
 				break;
 			}
 		}
+		// Play selected tile.
 		shipment = placeSelection();
+		// Play buildings and share resources with other players.
 		for (int i = 0; i < game->numPlayers(); i++) {
 			while (in->decide("Player " + std::to_string(game->nextID())
 				+ ", do you want to play a building?")) {
+				if (!game->canPlay()) {
+					std::cout << "You have no more valid moves.\n";
+					break;
+				}
 				if (!buildSelection()) {
 					break;
 				}
 			}
 			game->yield();
 		}
+		// Draw new buildings.
 		if ((exhausted = game->exhausted()) && !game->gameOver()) {
 			std::cout << "Player " << game->nextID() << ", you must draw " << exhausted
 				<< " buildings.\n";
@@ -69,7 +75,6 @@ void Controller::run() {
 				if (in->decide("Do you want to draw a building from the pool?")) {
 					if (!(selectBuilding())) {
 						i--;
-						continue;
 					}
 				}
 				else {
@@ -77,14 +82,23 @@ void Controller::run() {
 				}
 			}
 		}
+		// Housekeeping before next turn.
 		game->endTurn(shipment);
 	}
+	// Determine and display winner(s).
 	std::cout << "And our winner(s) is:\n";
 	for (auto& id : game->winners()) {
 		std::cout << "Player " << id << std::endl;
 	}
 	std::cout << "with " << game->highscore() << " villagers, " << game->buildingsPlayed()
 		<< " buildings erected, and " << game->buidlingsLeft() << " buildings left.";
+}
+
+void Controller::displayPossessions() const {
+	game->displayBoard();
+	game->displayTiles();
+	game->displayVillage();
+	game->displayBuildings();
 }
 
 bool Controller::rotateSelection() {

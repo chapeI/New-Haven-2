@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bitset>
 #include <map>
 #include <set>
 
@@ -50,7 +49,7 @@ public:
 	// exception if the specifeid coordinate does not reference a Node of this TokenGraph.
 	void removeTokenAt(std::pair<int, int>);
 	// Initiates a breadth-first search of this TokenGraph from the Node at the specified coordinate.
-	// Returns the number of Nodes that are connected to the source Node, which contain the same type
+	// Returns the number of Nodes that are connected to the source Node and contain the same type
 	// of Token as the source. Throws an exception if the specified coordinate does not reference a
 	// Node of this TokenGraph.
 	int search(std::pair<int, int>);
@@ -90,9 +89,8 @@ private:
 
 	};
 
-	int* occupied;
+	int* types;
 	std::map<std::pair<int, int>, Node*>* nodes;
-	std::bitset<AbstractToken::NUM_TYPES>* types;
 
 	Node* nodeAt(std::pair<int, int>) const;
 	std::pair<int, int> validateCoordinate(std::pair<int, int>) const;

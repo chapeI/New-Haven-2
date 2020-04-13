@@ -4,7 +4,6 @@
 #include "../util/Debug.h"
 #include "TokenGraph.h"
 
-using std::bitset;
 using std::map;
 using std::pair;
 using std::queue;
@@ -14,7 +13,7 @@ TokenGraph* TokenGraph::gridOf(int height, int width) {
 	TokenGraph* graph = new TokenGraph();
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			// Add nodes before edges to avoid dereferencing nullptrs
+			// Add nodes before edges to avoid dereferencing null pointers.
 			graph->addNode({ i, j });
 		}
 	}
@@ -33,18 +32,19 @@ TokenGraph* TokenGraph::gridOf(int height, int width) {
 }
 
 TokenGraph::TokenGraph() {
-	occupied = new int(0);
+	types = new int[AbstractToken::NUM_TYPES];
 	nodes = new map<pair<int, int>, Node*>();
-	types = new bitset<AbstractToken::NUM_TYPES>();
+	for (int i = 0; i < AbstractToken::NUM_TYPES; i++) {
+		types[i] = 0;
+	}
 }
 
 TokenGraph::~TokenGraph() {
-    for (auto& node : *nodes){
-        delete node.second;
-    }
-	delete occupied;
+	for (auto& node : *nodes){
+		delete node.second;
+	}
+	delete[] types;
 	delete nodes;
-	delete types;
 }
 
 void TokenGraph::addNode(pair<int, int> coordinate) {
@@ -63,7 +63,11 @@ bool TokenGraph::emptyAt(pair<int, int> coordinate) {
 }
 
 int TokenGraph::emptyNodes() const {
-	return nodes->size() - *(occupied);
+	int occupied = 0;
+	for (int i = 0; i < AbstractToken::NUM_TYPES; i++) {
+		occupied += types[i];
+	}
+	return nodes->size() - occupied;
 }
 
 AbstractToken* TokenGraph::tokenAt(pair<int, int> coordinate) const {
@@ -71,7 +75,7 @@ AbstractToken* TokenGraph::tokenAt(pair<int, int> coordinate) const {
 }
 
 bool TokenGraph::hasType(int type) const {
-	return (*types)[type];
+	return types[AbstractToken::validateType(type)];
 }
 
 bool TokenGraph::adjacentHolds(pair<int, int> coordinate, int tokenType) const {
@@ -88,15 +92,19 @@ bool TokenGraph::adjacentHolds(pair<int, int> coordinate, int tokenType) const {
 }
 
 void TokenGraph::setTokenAt(AbstractToken* token, pair<int, int> coordinate) {
-	nodeAt(coordinate)->token = token;
-	if (token) {
-		(*occupied)++;
-		(*types)[token->getType()] = true;
+	Node* n = nodeAt(coordinate);
+	if (n->token) {
+		types[n->token->getType()]--;
 	}
+	if (token) {
+		types[token->getType()]++;
+	}
+	n->token = token;
 }
 
 void TokenGraph::removeTokenAt(pair<int, int> coordinate) {
 	Node* n = nodeAt(coordinate);
+	types[n->token->getType()]--;
 	delete n->token;
 	n->token = nullptr;
 }
@@ -130,7 +138,7 @@ int TokenGraph::search(Node* s) {
 	int count = 1;
 	setupSearchAttributes(s->token);
 	*s->color = Node::GRAY;
- 	queue<Node*> q = queue<Node*>();
+	queue<Node*> q = queue<Node*>();
 	q.push(s);
 	while (!q.empty()) {
 		Node* u = q.front();

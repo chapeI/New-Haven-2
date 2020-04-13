@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
 
-#include "maps/VGMap.h"
-#include "pieces/HarvestTile.h"
+#include "../maps/VGMap.h"
+#include "../pieces/HarvestTile.h"
+#include "../util/Debug.h"
 #include "ScoringFacilities.h"
-#include "util/Debug.h"
 
 using std::map;
 
