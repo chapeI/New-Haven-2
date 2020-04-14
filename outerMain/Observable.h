@@ -11,3 +11,5 @@ public:
 private:
 	list<Observer*>* observers;
 };
+
+
