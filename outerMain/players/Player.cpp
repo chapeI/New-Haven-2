@@ -5,13 +5,30 @@
 
 using std::pair;
 
-Player::Player() : Player(new HarvestTile()) {}
+Player::Player() : Player(new HarvestTile(), observable) {}
 
-Player::Player(HarvestTile* shipment) {
+Player::Player(HarvestTile* shipment, GameScore* g) {
 	score = new int(0);
 	tiles = new HarvestTileHand(shipment);
 	buildings = new BuildingHand();
 	village = new VGMap();
+
+	// ANOOP
+	observable = g;
+	observable->Attach(this);
+	score_p1 = 0;
+	score_p2 = 0;
+}
+
+void Player::Update() {
+	cout << "debugging (player.cpp): NOTIFYING WORKED! Updating scores in current Player class " << endl;
+	score_p1 = observable->getScore_p1();
+	score_p2 = observable->getScore_p2();
+	this->dispScore_p1();
+}
+
+void Player::dispScore_p1() {
+	cout << "player 1's SCORE: " << score_p1 << endl;
 }
 
 Player::Player(const Player& other){

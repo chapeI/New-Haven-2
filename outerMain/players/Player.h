@@ -6,16 +6,24 @@
 #include "../maps/VGMap.h"
 #include "../pieces/Building.h"
 #include "../pieces/HarvestTile.h"
+#include "../Observer.h"
+#include "../GameScore.h"
 
 // The players of New Haven.
-class Player {
+class Player : public Observer {
 
 public:
 
 	// Constructs a new Player object.
 	Player();
 	// Constructs a new Player object with the specified shipment tile;
-	Player(HarvestTile*);
+	Player(HarvestTile*, GameScore* g);
+	
+	// ANOOP
+	void Update();
+	void dispScore_p1();
+	void dispScore_p2();
+
 	// Constructs a new Player object with the same attributes as the specified Player.
 	Player(const Player&);
 	// Destroys this Player.
@@ -86,5 +94,9 @@ private:
 	BuildingHand* buildings;
 	VGMap* village;
 
+	int score_p1;
+	int score_p2;
+
+	GameScore* observable;
 
 };

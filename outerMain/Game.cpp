@@ -16,6 +16,7 @@ Game::Game(int numPlayers) {
 	buildings = buildingDeck();
 	pool = new BuildingPool();
 	players = new Roster();
+	gameScore = new GameScore();
 }
 
 Game::~Game() {
@@ -73,7 +74,7 @@ void Game::addPlayer(long id) {
 	if (atCapacity()) {
 		throw std::runtime_error("Too many players.");
 	}
-	Player* player = new Player(tiles->draw());
+	Player* player = new Player(tiles->draw(), gameScore);
 	try {
 		players->add(id, player);
 	} catch (const std::invalid_argument& e) {
