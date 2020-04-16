@@ -32,6 +32,9 @@ size_t Roster::getSize() const {
 }
 
 long Roster::nextID() const {
+	if (ids->empty()) {
+		throw std::runtime_error("Roster is empty.");
+	}
 	return ids->front();
 }
 
@@ -86,7 +89,7 @@ Player* Roster::next() {
 
 Player* Roster::front(bool rotate) {
 	if (ids->empty()) {
-		throw std::runtime_error("No players.");
+		throw std::runtime_error("Roster is empty.");
 	}
 	long id = ids->front();
 	if (rotate) {
@@ -114,4 +117,12 @@ void Roster::deal(Deck<HarvestTile*>* tiles, Deck<Building*>* buildings) {
 			entry.second->drawBuilding(buildings);
 		}
 	}
+}
+
+RosterView* rosterView(Roster* roster) {
+	RosterView* view = new RosterView();
+	for (auto& entry : *roster->players) {
+		view->addView(playerView(entry.second));
+	}
+	return view;
 }

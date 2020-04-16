@@ -2,11 +2,13 @@
 
 Controller::Controller() {
 	game = nullptr;
+	view = nullptr;
 	in = new Input();
 }
 
 Controller::~Controller() {
 	delete game;
+	delete view;
 	delete in;
 }
 
@@ -36,13 +38,16 @@ void Controller::inputIDs() {
 			}
 		} while (true);
 	}
+	view = gameView(game);
 }
 
 void Controller::run() {
 	int exhausted;
-	bool shipment;
 	while (!game->gameOver()) {
-		displayPossessions();
+		view->showBoard();
+		view->showTiles();
+		view->showVillage();
+		view->showBuildings();
 		// Prompt player to rotate tiles.
 		while (in->decide("Player " + std::to_string(game->nextID())
 			+ ", do you want to rotate any of your tiles?")) {
@@ -51,7 +56,7 @@ void Controller::run() {
 			}
 		}
 		// Play selected tile.
-		shipment = placeSelection();
+		placeSelection();
 		// Play buildings and share resources with other players.
 		for (int i = 0; i < game->numPlayers(); i++) {
 			while (in->decide("Player " + std::to_string(game->nextID())
@@ -65,6 +70,7 @@ void Controller::run() {
 				}
 			}
 			game->yield();
+			view->rotate();
 		}
 		// Draw new buildings.
 		if ((exhausted = game->exhausted()) && !game->gameOver()) {
@@ -83,7 +89,8 @@ void Controller::run() {
 			}
 		}
 		// Housekeeping before next turn.
-		game->endTurn(shipment);
+		game->endTurn();
+		view->rotate();
 	}
 	// Determine and display winner(s).
 	std::cout << "And our winner(s) is:\n";
@@ -92,13 +99,6 @@ void Controller::run() {
 	}
 	std::cout << "with " << game->highscore() << " villagers, " << game->buildingsPlayed()
 		<< " buildings erected, and " << game->buidlingsLeft() << " buildings left.";
-}
-
-void Controller::displayPossessions() const {
-	game->displayBoard();
-	game->displayTiles();
-	game->displayVillage();
-	game->displayBuildings();
 }
 
 bool Controller::rotateSelection() {
@@ -110,7 +110,7 @@ bool Controller::rotateSelection() {
 		}
 		try {
 			game->rotateTile(selection);
-			game->displayTiles();
+			view->showTiles();
 			return true;
 		} catch (const std::exception& e) {
 			std::cerr << e.what() << " Try again.\n";
@@ -118,9 +118,8 @@ bool Controller::rotateSelection() {
 	} while (true);
 }
 
-bool Controller::placeSelection() {
+void Controller::placeSelection() {
 	int selection, row, col;
-	bool shipment = false;
 	do {
 		selection = in->get<int>("Select a tile", "Invalid selection.");
 		row = in->get<int>("Select a row", "Invalid row.");
@@ -133,32 +132,28 @@ bool Controller::placeSelection() {
 			}
 			try {
 				game->playShipment({ row, col }, type);
-				game->displayBoard(type, { row, col });
-				shipment = true;
 				break;
 			} catch (const std::exception& e) {
-				shipment = false;
 				std::cerr << e.what() << " Try again.\n";
 			}
 		}
 		else {
 			try {
 				game->playTile(selection, { row, col });
-				game->displayBoard();
 				break;
 			} catch (const std::exception& e) {
 				std::cerr << e.what() << " Try again.\n";
 			}
 		}
 	} while (true);
-	return shipment;
+	view->showBoard();
 }
 
 bool Controller::buildSelection() {
 	int selection = 0, row, col;
-	game->displayVillage();
-	game->displayResources();
-	game->displayBuildings();
+	view->showVillage();
+	view->showResources();
+	view->showBuildings();
 	do {
 		selection = in->get<int>("Select a building", "Ivalid selection.", true);
 		if (in->cancelled()) {
@@ -171,14 +166,14 @@ bool Controller::buildSelection() {
 			return true;
 		} catch (const std::exception& e) {
 			std::cerr << e.what() << " Try again.\n";
-			game->displayBuildings();
+			view->showBuildings();
 		}
 	} while (true);
 }
 
 bool Controller::selectBuilding(bool canCancel) {
 	int selection = 0;
-	game->displayPool();
+	view->showPool();
 	do {
 		selection = in->get<int>("Select a building", "Invalid selection.", canCancel);
 		if (in->cancelled()) {

@@ -1,13 +1,14 @@
-#include <iostream>
+#include <sstream>
 
 #include "../Game.h"
 #include "../util/Debug.h"
 #include "GBMap.h"
 
 using std::pair;
+using std::string;
 using std::vector;
 
-// Statically initialize error messages that are frequently encountered and/or expensive to create.
+// Statically initialize objects that are frequently used and/or expensive to create.
 std::string GBMap::INVALID_NUM_PLAYERS = "Number of players must be between "
 	+ std::to_string(PLAYERS_MIN) + " and " + std::to_string(PLAYERS_MAX) + ".";
 
@@ -54,10 +55,12 @@ std::vector<std::pair<int, int>> GBMap::corners() const {
 }
 
 int GBMap::squaresLeft() const {
+	int squares = graph->emptyNodes();
+	// Don't count corner squares.
 	if (*numPlayers == PLAYERS_MAX) {
-		return (graph->emptyNodes() - (PLAYERS_MAX << PLAYERS_MIN)) >> PLAYERS_MIN;
+		squares -= PLAYERS_MAX << PLAYERS_MIN;
 	}
-	return graph->emptyNodes() >> PLAYERS_MIN;
+	return squares >> PLAYERS_MIN;
 }
 
 void GBMap::setSquare(HarvestTile* tile, pair<int, int> square) {
@@ -68,6 +71,7 @@ void GBMap::setSquare(HarvestTile* tile, pair<int, int> square) {
 		graph->setTokenAt(tile->tokenize(), coordinate);
 	}
 	delete tile;
+	notify();
 }
 
 void GBMap::calculateResources(pair<int, int> from, GatherFacility* resources,
@@ -77,6 +81,7 @@ void GBMap::calculateResources(pair<int, int> from, GatherFacility* resources,
 		for (auto& coordinate : coordinatesOf(from, true)) {
 			graph->setTokenAt(new ResourceToken(*shipment), coordinate);
 		}
+		notify();
 	}
 	// Perform search for conntected resources starting from the four coordinates in from.
 	for (auto& coordinate : coordinatesOf(from)) {
@@ -96,25 +101,6 @@ void GBMap::calculateResources(pair<int, int> from, GatherFacility* resources,
 	}
 	// Clean up graph for next search.
 	graph->cleanupSearch();
-}
-
-void GBMap::display() const {
-	std::cout << *this;
-}
-
-void GBMap::display(int type, pair<int, int> square) const {
-	int index = 0;
-	ResourceToken resource(static_cast<ResourceType>(AbstractToken::validateType(type)));
-	ResourceToken* temp[HarvestTile::NUM_RESOURCES] = {};
-	for (auto& coordinate : coordinatesOf(square)) {
-		temp[index++] = static_cast<ResourceToken*>(graph->tokenAt(coordinate));
-		graph->setTokenAt(&resource, coordinate);
-	}
-	index = 0;
-	std::cout << *this;
-	for (auto& coordinate : coordinatesOf(square)) {
-		graph->setTokenAt(temp[index++], coordinate);
-	}
 }
 
 int GBMap::height() const {
@@ -142,8 +128,7 @@ int GBMap::width() const {
 }
 
 vector<pair<int, int>> GBMap::coordinatesOf(pair<int, int> square, bool ensureEmpty) const {
-	validateSquare(square);
-	vector<pair<int, int>> coordinates = expand(square);
+	vector<pair<int, int>> coordinates = expand(validateSquare(square));
 	if (ensureEmpty) {
 		for (auto& coordinate : coordinates) {
 			if (graph->tokenAt(coordinate)) {
@@ -163,7 +148,7 @@ vector<pair<int, int>> GBMap::expand(pair<int, int> square) {
 	return coordinates;
 }
 
-void GBMap::validateSquare(pair<int, int> square) const {
+pair<int, int> GBMap::validateSquare(pair<int, int> square) const {
 	int row = square.first, col = square.second;
 	switch (*numPlayers) {
 	case 4:
@@ -179,31 +164,18 @@ void GBMap::validateSquare(pair<int, int> square) const {
 	default:
 		throw std::logic_error("FATAL ERROR: numPlayers has unexpected value.");
 	}
+	return square;
 }
 
 bool GBMap::isOnCorner(int row, int col) const {
 	return (row == 0 || row == height() - 1) && (col == 0 || col == width() - 1);
 }
 
-int numberOfSpaces(GBMap& map) {
-	int nodes;
-	auto tokens = map.graph->tokens();
-	// Clear map so that all nodes will be counted.
-	for (auto& entry : tokens) {
-		map.graph->setTokenAt(nullptr, entry.first);
-	}
-	nodes = map.graph->search((*tokens.begin()).first);
-	// Put map back into its original state.
-	for (auto& entry : tokens) {
-		map.graph->setTokenAt(entry.second, entry.first);
-	}
-	return nodes >> 2;
-}
-
-std::ostream& operator<<(std::ostream& stream, const GBMap& map) {
+string* GBMap::toString() const {
 	int coordinate = 0;
+	std::ostringstream stream;
 	stream << '\t';
-	for (int i = 0; i < map.width(); i++) {
+	for (int i = 0; i < width(); i++) {
 		if (i & 1) {
 			stream << '\t';
 		}
@@ -213,15 +185,15 @@ std::ostream& operator<<(std::ostream& stream, const GBMap& map) {
 	}
 	coordinate = 0;
 	stream << "\n\n\n";
-	for (int i = 0; i < map.height(); i++) {
+	for (int i = 0; i < height(); i++) {
 		if (i & 1) {
 			stream << '\t';
 		}
 		else {
 			stream << coordinate++ << '\t';
 		}
-		for (int j = 0; j < map.width(); j++) {
-			ResourceToken* resource = static_cast<ResourceToken*>(map.graph->tokenAt({ i, j }));
+		for (int j = 0; j < width(); j++) {
+			ResourceToken* resource = static_cast<ResourceToken*>(graph->tokenAt({ i, j }));
 			if (resource) {
 				stream << *resource << '\t';
 			}
@@ -231,5 +203,5 @@ std::ostream& operator<<(std::ostream& stream, const GBMap& map) {
 		}
 		stream << "\n\n\n";
 	}
-	return stream;
+	return new string(stream.str());
 }

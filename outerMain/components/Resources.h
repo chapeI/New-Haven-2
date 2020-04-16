@@ -1,8 +1,11 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 #include <vector>
 
+
+// #include "../observers/Observable.h" // muted by anoop
 #include "../pieces/AbstractPiece.h"
 #include "../pieces/Building.h"
 #include "../pieces/HarvestTile.h"
@@ -155,10 +158,10 @@ public:
 	// Adds the specified HarvestTile to this Hand as its shipment tile. Throws an exception if
 	// this Hand already has a shipment tile.
 	void receive(HarvestTile*);
-	// Writes this HarvestTileHand to the standard outoput stream.
-	void display() const;
 
-	friend std::ostream& operator<<(std::ostream&, const HarvestTileHand&);
+protected:
+
+	std::string* toString() const override;
 
 private:
 
@@ -192,10 +195,10 @@ public:
 	// Returns the type of the selected Building. Throws an exception if the specified selection
 	// does not exist.
 	int typeOf(int) const;
-	// Writes this BuildingHand to the standard outoput stream.
-	void display() const;
 
-	friend std::ostream& operator<<(std::ostream&, const BuildingHand&);
+protected:
+
+	std::string* toString() const override;
 
 private:
 	
@@ -224,10 +227,10 @@ public:
 	void replenish(Deck<Building*>*);
 	// Removes the selected Building from this BuildingPool.
 	Building* remove(int);
-	// Writes this BuildingPool to the standard output stream.
-	void display() const;
 
-	friend std::ostream& operator<<(std::ostream&, const BuildingPool&);
+protected:
+
+	std::string* toString() const override;
 
 private:
 

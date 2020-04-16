@@ -1,7 +1,6 @@
-#include <iostream>
-
 #include "Player.h"
 #include "../util/Debug.h"
+#include "../views/PlayerView.h"
 
 using std::pair;
 
@@ -140,18 +139,6 @@ void Player::store(HarvestTile* tile) {
 	tiles->receive(tile);
 }
 
-void Player::displayTiles() const {
-	std::cout << *tiles;
-}
-
-void Player::displayBuildings() const {
-	std::cout << *buildings;
-}
-
-void Player::displayVillage() const {
-	std::cout << *village;
-}
-
 bool Player::operator<(const Player& other) const {
 	if (*score != *other.score) {
 		return *score < *other.score;
@@ -165,4 +152,8 @@ bool Player::operator<(const Player& other) const {
 bool Player::operator==(const Player& other) const {
 	return *score == *other.score && built() == other.built()
 		&& unbuilt() == other.unbuilt();
+}
+
+PlayerView* playerView(Player* player) {
+	return new PlayerView(player->tiles, player->buildings, player->village);
 }
