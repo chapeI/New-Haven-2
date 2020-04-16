@@ -44,7 +44,7 @@ public:
 	// each Player in this Roster. Throws an exception if either of the specified Decks are null.
 	void deal(Deck<HarvestTile*>*, Deck<Building*>*);
 
-	Player* operator[](std::size_t idx);
+	Player* operator[](size_t idx);
 
 private:
 	

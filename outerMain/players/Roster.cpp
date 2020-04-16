@@ -116,7 +116,7 @@ void Roster::deal(Deck<HarvestTile*>* tiles, Deck<Building*>* buildings) {
 	}
 }
 
-Player* Roster::operator[](std::size_t idx) {
+Player* Roster::operator[](size_t idx) {
 	if (idx < 0 || idx >= ids->size()) {
 		throw std::out_of_range("Invalid index.");
 	}
