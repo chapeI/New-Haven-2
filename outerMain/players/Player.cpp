@@ -12,6 +12,7 @@ Player::Player(HarvestTile* shipment) {
 	tiles = new HarvestTileHand(shipment);
 	buildings = new BuildingHand();
 	village = new VGMap();
+	score_DEBUG = 0;
 }
 
 Player::Player(const Player& other){
@@ -19,6 +20,7 @@ Player::Player(const Player& other){
 	tiles = new HarvestTileHand(*other.tiles);
 	buildings = new BuildingHand(*other.buildings);
 	village = new VGMap(*other.village);
+	score_DEBUG = 0;
 }
 
 Player::~Player(){
@@ -26,6 +28,11 @@ Player::~Player(){
 	delete tiles;
 	delete buildings;
 	delete village;
+}
+
+void Player::incrementScore() {
+	score_DEBUG++;
+	Notify();
 }
 
 bool Player::canPlay(GatherFacility* resources) const {

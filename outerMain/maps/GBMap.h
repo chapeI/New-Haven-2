@@ -4,12 +4,11 @@
 #include <vector>
 
 #include "../components/ScoringFacilities.h"
-#include "../observer/Observable.h"
 #include "../pieces/HarvestTile.h"
 #include "TokenGraph.h"
 
 // The common board onto which HarvestTiles are placed.
-class GBMap : public Observable {
+class GBMap {
 
 	static constexpr int DIM_MIN = 10, DIM_MAX = 14;
 	static constexpr int PLAYERS_MIN = 2, PLAYERS_MAX = 4;

@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "../observer/Observable.h"
 #include "../pieces/AbstractPiece.h"
 #include "../pieces/Building.h"
 #include "../pieces/HarvestTile.h"
@@ -128,7 +127,7 @@ Deck<HarvestTile*>* harvestTileDeck();
 Deck<Building*>* buildingDeck();
 
 // The collection of HarvestTiles owned by a Player.
-class HarvestTileHand : public Observable {
+class HarvestTileHand {
 
 public:
 
@@ -174,7 +173,7 @@ private:
 };
 
 // The collection of Buildings owned by a Player.
-class BuildingHand : public Observable {
+class BuildingHand {
 	
 public:
 	// Constructs a new BuildingHand object.
@@ -207,7 +206,7 @@ private:
 };
 
 // A common collection of Buildings.
-class BuildingPool : public Observable {
+class BuildingPool {
 
 	static constexpr int POOL_SIZE = 5;
 

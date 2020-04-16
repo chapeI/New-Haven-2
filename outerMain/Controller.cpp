@@ -84,6 +84,14 @@ void Controller::run() {
 		}
 		// Housekeeping before next turn.
 		game->endTurn(shipment);
+		cout << " " << endl << endl;
+		cout << "--------------------- END OF TURN ----------------------" << endl << endl << endl;
+		cout << "--------------------- TESTING OBSERVABLES -----------------" << endl << endl;
+		//game->gameScore->incrScore_p1();
+
+		cout << " " << endl << endl;
+		cout << "--------------------- BEGINNING OF NEW TURN ----------------------" << endl << endl << endl;
+
 	}
 	// Determine and display winner(s).
 	std::cout << "And our winner(s) is:\n";

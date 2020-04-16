@@ -6,9 +6,10 @@
 #include "../maps/VGMap.h"
 #include "../pieces/Building.h"
 #include "../pieces/HarvestTile.h"
+#include "../Observable.h"
 
 // The players of New Haven.
-class Player {
+class Player : public Observable {
 
 public:
 
@@ -79,12 +80,15 @@ public:
 	bool operator<(const Player&) const;
 	bool operator==(const Player&) const;
 
+	void incrementScore();
+
 private:
 	
 	int* score;
 	HarvestTileHand* tiles;
 	BuildingHand* buildings;
 	VGMap* village;
-
+	
+	int* score_DEBUG;
 
 };

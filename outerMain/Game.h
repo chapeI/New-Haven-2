@@ -6,6 +6,8 @@
 #include "players/Player.h"
 #include "players/Roster.h"
 
+#include "GameScore.h"
+
 // A game of New Haven.
 class Game {
 
@@ -95,6 +97,8 @@ public:
 	void displayBuildings() const;
 	// Writes this Game's BuildingPool to the standard output stream.
 	void displayPool() const;
+
+	GameScore* gameScore;
 
 private:
 

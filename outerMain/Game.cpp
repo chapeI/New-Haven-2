@@ -16,6 +16,7 @@ Game::Game(int numPlayers) {
 	buildings = buildingDeck();
 	pool = new BuildingPool();
 	players = new Roster();
+	gameScore = new GameScore(players.); // ISSUE HERE!
 }
 
 Game::~Game() {
