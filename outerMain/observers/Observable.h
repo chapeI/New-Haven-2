@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <string>
 
 #include "Observer.h"
 
@@ -12,6 +13,12 @@ public:
 	~Observable();
 	void attach(Observer*);
 	void notify();
+
+	friend std::ostream& operator<<(std::ostream&, const Observable&);
+
+protected:
+
+	virtual std::string* toString() const = 0;
 
 private:
 

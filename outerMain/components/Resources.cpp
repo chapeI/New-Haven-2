@@ -1,10 +1,11 @@
-#include <iostream>
+#include <sstream>
 
 #include "../maps/TokenGraph.h"
 #include "../maps/VGMap.h"
 #include "../util/Debug.h"
 #include "Resources.h"
 
+using std::string;
 using std::vector;
 
 HarvestTileHand::HarvestTileHand() : HarvestTileHand(new HarvestTile()) {}
@@ -37,6 +38,7 @@ void HarvestTileHand::insert(HarvestTile* tile) {
 	else {
 		one = tile;
 	}
+	notify();
 }
 
 bool HarvestTileHand::isFull() const {
@@ -49,6 +51,7 @@ HarvestTile* HarvestTileHand::select(int selection) {
 
 void HarvestTileHand::rotate(int selection) {
 	validateSelection(selection, false)->rotate();
+	notify();
 }
 
 HarvestTile* HarvestTileHand::validateSelection(int selection, bool remove) {
@@ -92,6 +95,7 @@ HarvestTile* HarvestTileHand::ship() {
 	}
 	HarvestTile* tile = shipment;
 	shipment = nullptr;
+	notify();
 	return tile;
 }
 
@@ -100,20 +104,18 @@ void HarvestTileHand::receive(HarvestTile* tile) {
 		throw std::runtime_error("Shipment already exists.");
 	}
 	shipment = tile;
+	notify();
 }
 
-void HarvestTileHand::display() const {
-	std::cout << *this;
-}
-
-std::ostream& operator<<(std::ostream& stream, const HarvestTileHand& hand) {
+string* HarvestTileHand::toString() const {
+	std::ostringstream stream;
 	stream << "1\t\t2\t\t";
-	if (hand.shipment) {
+	if (shipment) {
 		stream << "3 - Shipment";
 	}
 	stream << '\n';
-	HarvestTile::printHand(stream, *hand.one, *hand.two, hand.shipment);
-	return stream;
+	HarvestTile::printHand(stream, *one, *two, shipment);
+	return new string(stream.str());
 }
 
 BuildingHand::BuildingHand() {
@@ -139,12 +141,14 @@ size_t BuildingHand::getSize() const {
 
 void BuildingHand::insert(Building* building) {
 	owned->push_back(building);
+	notify();
 }
 
 Building* BuildingHand::select(int selection) {
 	int index = validateSelection(selection);
 	Building* building = (*owned)[index];
 	owned->erase(owned->begin() + index);
+	notify();
 	return building;
 }
 
@@ -159,25 +163,22 @@ int BuildingHand::validateSelection(int selection) const {
 	return --selection;
 }
 
-void BuildingHand::display() const {
-	std::cout << *this;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, const BuildingHand& hand) {
-	for (int i = 0; i < hand.owned->size(); i++) {
+string* BuildingHand::toString() const {
+	std::ostringstream stream;
+	for (int i = 0; i < owned->size(); i++) {
 		stream << i + 1 << '\t';
 	}
 	stream << '\n';
-	for (int i = 0; i < hand.owned->size(); i++) {
-		if ((*hand.owned)[i]) {
-			stream << *(*hand.owned)[i] << '\t';
+	for (int i = 0; i < owned->size(); i++) {
+		if ((*owned)[i]) {
+			stream << *(*owned)[i] << '\t';
 		}
 		else {
 			stream << "-\t";
 		}
 	}
-	return std::cout << '\n';
+	stream << '\n';
+	return new string(stream.str());
 }
 
 BuildingPool::BuildingPool() {
@@ -214,6 +215,7 @@ void BuildingPool::replenish(Deck<Building*>* deck) {
 			(*pool)[i] = deck->draw();
 		}
 	}
+	notify();
 }
 
 Building* BuildingPool::remove(int selection) {
@@ -225,19 +227,17 @@ Building* BuildingPool::remove(int selection) {
 		throw std::invalid_argument("Building unavailable.");
 	}
 	(*pool)[selection] = nullptr;
+	notify();
 	return result;
 }
 
-void BuildingPool::display() const {
-	std::cout << *this;
-}
-
-std::ostream& operator<<(std::ostream& stream, const BuildingPool& buildings) {
-	for (int i = 0; i < BuildingPool::POOL_SIZE; i++) {
+string* BuildingPool::toString() const {
+	std::ostringstream stream;
+	for (int i = 0; i < POOL_SIZE; i++) {
 		stream << i + 1 << '\t';
 	}
 	stream << '\n';
-	for (auto& building : *buildings.pool) {
+	for (auto& building : *pool) {
 		if (building) {
 			stream << *building << '\t';
 		}
@@ -245,7 +245,8 @@ std::ostream& operator<<(std::ostream& stream, const BuildingPool& buildings) {
 			stream << "-\t";
 		}
 	}
-	return stream << '\n';
+	stream << '\n';
+	return new string(stream.str());
 }
 
 Deck<HarvestTile*>* harvestTileDeck() {

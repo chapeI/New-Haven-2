@@ -1,9 +1,12 @@
 #pragma once
 
 #include <map>
+#include <string>
+
+#include "../observers/Observable.h"
 
 // Records the number of resources available to Players.
-class GatherFacility {
+class GatherFacility : public Observable {
 
 public:
 
@@ -24,10 +27,10 @@ public:
 	void incrementBy(int, int);
 	// Resets the tallies for each resource type recorded on this GatherFacility to zero.
 	void reset();
-	// Writes this GatherFacility to the statndard output stream.
-	void display() const;
 
-	friend std::ostream& operator<<(std::ostream&, const GatherFacility&);
+protected:
+
+	std::string* toString() const override;
 
 private:
 

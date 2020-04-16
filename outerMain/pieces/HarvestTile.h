@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "AbstractPiece.h"
@@ -34,8 +35,6 @@ public:
 	void rotate();
 	// Iteratively returns the ResourceTokens that constitute this HarvestTile.
 	ResourceToken* tokenize();
-	// Writes this HarvestTile to the standard output stream.
-	void display() const;
 
 	friend std::ostream& operator<<(std::ostream&, const HarvestTile&);
 
@@ -44,7 +43,7 @@ private:
 	int* current;
 	std::vector<ResourceToken*>* resources;
 
-	static void printHalf(std::ostream&, const HarvestTile&, int, bool = false);
+	void printHalf(std::ostream&, int, bool = false) const;
 
 	// For GBMapLoader.
 	HarvestTile(int);

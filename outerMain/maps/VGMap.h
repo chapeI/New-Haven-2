@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ostream>
+#include <string>
 
 #include "../components/ScoringFacilities.h"
-#include "../observer/Observable.h"
+#include "../observers/Observable.h"
 #include "../pieces/Building.h"
 #include "TokenGraph.h"
 
@@ -40,10 +40,10 @@ public:
 	void setCircle(Building*, std::pair<int, int>);
 	// Counts the villagers that have been attracted to this VGMap.
 	int calculateScore();
-	// Writes this VGMap to the standard output stream.
-	void display() const;
 
-	friend std::ostream& operator<<(std::ostream&, const VGMap&);
+protected:
+
+	std::string* toString() const override;
 
 private:
 

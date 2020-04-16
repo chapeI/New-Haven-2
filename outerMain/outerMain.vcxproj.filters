@@ -54,24 +54,6 @@
     <ClCompile Include="util\Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test\GBMapDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\VGMapDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\MapLoaderDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\PlayerDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\ResourcesDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\ScoringFacilitiesDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,12 +61,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Controller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="observer\Observable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="observer\Event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="players\Player.cpp">
@@ -97,6 +73,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="components\ScoringFacilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="observers\Observable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\PlayerView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\View.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\RosterView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\GameView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,27 +134,6 @@
     <ClInclude Include="util\Assert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test\GBMapDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\VGMapDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\MapLoaderDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\PlayerDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\ResourcesDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\Drivers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test\ScoringFacilitiesDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -176,15 +146,6 @@
     <ClInclude Include="Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="observer\Observable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="observer\Observer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="observer\Event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="players\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -195,6 +156,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="components\ScoringFacilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="observers\Observable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="observers\Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="views\PlayerView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="views\View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="views\RosterView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="views\GameView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

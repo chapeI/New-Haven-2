@@ -1,5 +1,3 @@
-#include <string>
-
 #include "components/Resources.h"
 #include "Game.h"
 #include "util/Debug.h"
@@ -11,6 +9,7 @@ Game::Game() : Game(DEFAULT_NUM_PLAYERS) {}
 
 Game::Game(int numPlayers) {
 	board = new GBMap(numPlayers);
+	shipment = nullptr;
 	resources = new GatherFacility();
 	tiles = harvestTileDeck();
 	buildings = buildingDeck();
@@ -20,6 +19,7 @@ Game::Game(int numPlayers) {
 
 Game::~Game() {
 	delete board;
+	delete shipment;
 	delete resources;
 	delete tiles;
 	delete buildings;
@@ -99,27 +99,31 @@ void Game::setup() {
 }
 
 void Game::rotateTile(int selection) {
+	ensureSetup();
 	players->peek()->rotateTile(selection);
 }
 
 void Game::playTile(int selection, pair<int, int> square) {
+	ensureSetup();
 	players->peek()->placeTile(selection, board, square);
 	board->calculateResources(square, resources);
 }
 
 void Game::playShipment(pair<int, int> coordinate, int type) {
+	ensureSetup();
 	ResourceToken token(static_cast<ResourceType>(AbstractToken::validateType(type)));
-	HarvestTile* shipment = players->peek()->reap();
+	HarvestTile* tile = players->peek()->reap();
 	try {
 		board->calculateResources(coordinate, resources, &token);
-		board->setSquare(shipment, coordinate);
+		shipment = new Shipment{ tile, coordinate };
 	} catch (const std::exception& e) {
-		players->peek()->store(shipment);
+		players->peek()->store(tile);
 		throw e;
 	}
 }
 
 void Game::playBuilding(int selection, pair<int, int> coordinate) {
+	ensureSetup();
 	int type, cost = VGMap::HEIGHT - coordinate.first;
 	Player* current = players->peek();
 	type = current->buildingType(selection);
@@ -133,52 +137,45 @@ void Game::playBuilding(int selection, pair<int, int> coordinate) {
 }
 
 void Game::yield() {
+	ensureSetup();
 	players->next();
 }
 
 void Game::drawFromDeck() {
+	ensureSetup();
 	players->peek()->drawBuilding(buildings);
 }
 
 void Game::drawFromPool(int selection) {
+	ensureSetup();
 	players->peek()->drawBuilding(pool, selection);
 }
 
-void Game::endTurn(bool shipped) {
+void Game::endTurn() {
+	ensureSetup();
 	resources->reset();
 	pool->replenish(buildings);
-	if (!shipped) {
-		players->next()->drawTile(tiles);
+	if (shipment) {
+		board->setSquare(shipment->payload, shipment->coordinate);
+		delete shipment;
+		shipment = nullptr;
 	}
 	else {
-		players->next();
+		players->next()->drawTile(tiles);
 	}
 }
 
-void Game::displayBoard() const {
-	board->display();
+void Game::ensureSetup() {
+	if (!atCapacity()) {
+		throw std::runtime_error("Game is not ready.");
+	}
 }
 
-void Game::displayBoard(int type, pair<int, int> square) const {
-	board->display(type, square);
-}
-
-void Game::displayTiles() const {
-	players->peek()->displayTiles();
-}
-
-void Game::displayVillage() const {
-	players->peek()->displayVillage();
-}
-
-void Game::displayResources() const {
-	resources->display();
-}
-
-void Game::displayBuildings() const {
-	players->peek()->displayBuildings();
-}
-
-void Game::displayPool() const {
-	pool->display();
+GameView* gameView(Game* game) {
+	GameView* view = new GameView();
+	view->addBoard(game->board);
+	view->addResources(game->resources);
+	view->addPool(game->pool);
+	view->addPlayers(game->players);
+	return view;
 }
