@@ -100,6 +100,8 @@ public:
 
 	GameScore* gameScore;
 
+	Roster* players;
+
 private:
 
 	GBMap* board;
@@ -107,7 +109,6 @@ private:
 	Deck<HarvestTile*>* tiles;
 	Deck<Building*>* buildings;
 	BuildingPool* pool;
-	Roster* players;
 
 	bool atCapacity() const;
 	void setup();

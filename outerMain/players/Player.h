@@ -82,6 +82,8 @@ public:
 
 	void incrementScore();
 
+	int getScore_debug();
+
 private:
 	
 	int* score;
@@ -89,6 +91,6 @@ private:
 	BuildingHand* buildings;
 	VGMap* village;
 	
-	int* score_DEBUG;
+	int score_DEBUG;
 
 };

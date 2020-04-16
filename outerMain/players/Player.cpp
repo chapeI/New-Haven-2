@@ -31,6 +31,7 @@ Player::~Player(){
 }
 
 void Player::incrementScore() {
+	cout << "DEBUG: entering player increment method" << endl;
 	score_DEBUG++;
 	Notify();
 }
@@ -69,6 +70,11 @@ int Player::unbuilt() const {
 
 int Player::getScore() const {
 	return *score;
+}
+
+int Player::getScore_debug() {
+	cout << "DEBUG: getting score from Player" << endl;
+	return score_DEBUG;
 }
 
 void Player::drawBuilding(Deck<Building*>* deck) {

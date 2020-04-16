@@ -3,11 +3,14 @@
 #include "components/Resources.h"
 #include "Game.h"
 #include "util/Debug.h"
+#include <iostream>
 
 using std::pair;
 
 
 Game::Game() : Game(DEFAULT_NUM_PLAYERS) {}
+
+Player* playersTemp[2];
 
 Game::Game(int numPlayers) {
 	board = new GBMap(numPlayers);
@@ -96,6 +99,14 @@ void Game::setup() {
 	pool->replenish(buildings);
 	players->sort();
 	players->deal(tiles, buildings);
+
+	for (int i = 0; i < 2; i++) {
+		playersTemp[i] = players->next();
+	}
+
+	cout << "DEBUG (Game.cpp in the setup()): does GameScore constructor get called at any point" << endl;
+	GameScore(playersTemp[0], playersTemp[1]);
+	gameScore->displayScores();
 }
 
 void Game::rotateTile(int selection) {
