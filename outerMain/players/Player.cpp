@@ -31,7 +31,7 @@ Player::~Player(){
 }
 
 void Player::incrementScore() {
-	cout << "DEBUG: entering player increment method" << endl;
+	cout << "DEBUG (Player.cpp): incrementScore()" << endl;
 	score_DEBUG++;
 	Notify();
 }
@@ -73,7 +73,7 @@ int Player::getScore() const {
 }
 
 int Player::getScore_debug() {
-	cout << "DEBUG: getting score from Player" << endl;
+	cout << "DEBUG (player.cpp): getScore_debug() => getting score from Player" << endl;
 	return score_DEBUG;
 }
 

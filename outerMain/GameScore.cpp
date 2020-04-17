@@ -23,8 +23,10 @@ void GameScore::Update() {
 	cout << "DEBUG (GameScore.cpp): entering Update()" << endl;
 	score_p1 = observable1->getScore_debug();
 	score_p2 = observable2->getScore_debug();
+	cout << "DEBUG (GameScore.cpp): GameScore Updated!" << endl;
+
 }
 
 void GameScore::displayScores() {
-	cout << "should display scores here" << endl;
+	cout << "DEBUG (GameScore.cpp): displayScores() => p1: " << score_p1 << " p2: " << score_p2 <<  endl;
 }

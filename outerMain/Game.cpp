@@ -105,7 +105,7 @@ void Game::setup() {
 		playersTemp[i] = players->next();
 	}
 
-	cout << "DEBUG (Game.cpp in the setup()): does GameScore constructor get called at any point" << endl;
+	cout << "DEBUG (Game.cpp in the setup): calling GameScore constructor " << endl;
 	gameScore = new GameScore(playersTemp[0], playersTemp[1]);
 	gameScore->displayScores();
 }

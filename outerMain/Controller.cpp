@@ -87,11 +87,10 @@ void Controller::run() {
 		cout << " " << endl << endl;
 		cout << "--------------------- END OF TURN ----------------------" << endl << endl << endl;
 		cout << "--------------------- TESTING OBSERVABLES -----------------" << endl << endl;
-		cout << "DEBUG: INCREMENTING SCORES" << endl;
+
+		cout << "DEBUG (controller.cpp): INCREMENTING SCORES" << endl;
 		game->players->peek()->incrementScore();
-		cout << "score incremented pass" << endl;
 		game->gameScore->displayScores();
-		//game->gameScore->incrScore_p1();
 
 		cout << " " << endl << endl;
 		cout << "--------------------- BEGINNING OF NEW TURN ----------------------" << endl << endl << endl;
