@@ -19,6 +19,7 @@ Game::Game(int numPlayers) {
 	buildings = buildingDeck();
 	pool = new BuildingPool();
 	players = new Roster();
+	gameScore = nullptr;
 }
 
 Game::~Game() {
@@ -105,7 +106,7 @@ void Game::setup() {
 	}
 
 	cout << "DEBUG (Game.cpp in the setup()): does GameScore constructor get called at any point" << endl;
-	GameScore(playersTemp[0], playersTemp[1]);
+	gameScore = new GameScore(playersTemp[0], playersTemp[1]);
 	gameScore->displayScores();
 }
 
